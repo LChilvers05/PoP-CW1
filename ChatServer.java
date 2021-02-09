@@ -56,6 +56,10 @@ class ChatServer {
 
   public static void main(String[] args) {
     ChatServer chatServer = new ChatServer(PortHelper.getPort(args));
+    ServerCloser closer = new ServerCloser();
+    Thread closerThread = new Thread(closer);
+
+    closerThread.start();
   }
 
   //helper functions
