@@ -3,7 +3,7 @@ class ChatServer {
 
 
 
-
+  //gets the port number from console arguments
   private int getPort(String[] args) {
     if (args.length == 2) {
       boolean portFlag = false;
