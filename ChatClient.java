@@ -52,7 +52,6 @@ class ChatClient {
         //print response
         String serverResponse = serverIn.readLine();
         println(serverResponse);
-
       }
 
     } catch (IOException e) {
@@ -64,7 +63,9 @@ class ChatClient {
   }
 
   public static void main(String[] args) {
-    ChatClient chatClient = new ChatClient("localhost", 14001);
+    String addArg = ArgHandler.getAddressAndPort(args)[0];
+    int portArg = Integer.parseInt(ArgHandler.getAddressAndPort(args)[1]);
+    ChatClient chatClient = new ChatClient(addArg, portArg);
     chatClient.connect();
   }
   //helper functions

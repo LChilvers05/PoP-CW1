@@ -63,7 +63,8 @@ class ChatServer {
   }
 
   public static void main(String[] args) {
-    ChatServer chatServer = new ChatServer(PortHelper.getPort(args));
+    int portArg = Integer.parseInt(ArgHandler.getAddressAndPort(args)[1]);
+    ChatServer chatServer = new ChatServer(portArg);
     chatServer.startServer();
   }
 
