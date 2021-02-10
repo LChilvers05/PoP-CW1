@@ -28,7 +28,7 @@ class ArgHandler {
             int portCheck = Integer.parseInt(arg);
             addressPort[1] = arg;
           } catch (NumberFormatException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             System.out.println("Error - using default port 14001");
           }
           

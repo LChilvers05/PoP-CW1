@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-class ClientHandler implements Runnable {
+class ClientConnection implements Runnable {
 
   private Socket clientSocket;
 
@@ -16,7 +16,7 @@ class ClientHandler implements Runnable {
    * for handling client connections on a separate thread
    * @param clientSocket
    */
-  public ClientHandler(Socket clientSocket) {
+  public ClientConnection(Socket clientSocket) {
     this.clientSocket = clientSocket;
   }
 

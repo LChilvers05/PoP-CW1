@@ -48,7 +48,7 @@ class ChatServer {
         println("Connection on: " + socket.getLocalPort() + " ; " + clientSocket.getPort());
 
         //create and start new thread for this client
-        ClientHandler client = new ClientHandler(clientSocket);
+        ClientConnection client = new ClientConnection(clientSocket);
         Thread clientThread = new Thread(client);
         clientThread.start();
       }
