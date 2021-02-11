@@ -41,17 +41,15 @@ class ChatClient {
       //to send data to server
       PrintWriter serverOut = new PrintWriter(socket.getOutputStream(), true);
 
-      //to read data from server
-      BufferedReader serverIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      //start new server connection thread to read messages
+      ServerConnection server = new ServerConnection(socket);
+      Thread serverThread = new Thread(server);
+      serverThread.start();
 
       while(true) {
         //send request
         String userInputStr = userInput.readLine();
         serverOut.println(userInputStr);
-
-        //print response
-        String serverResponse = serverIn.readLine();
-        println(serverResponse);
       }
 
     } catch (IOException e) {
@@ -67,9 +65,5 @@ class ChatClient {
     int portArg = Integer.parseInt(ArgHandler.getAddressAndPort(args)[1]);
     ChatClient chatClient = new ChatClient(addArg, portArg);
     chatClient.connect();
-  }
-  //helper functions
-  public static void println(String msg) {
-    System.out.println(msg);
   }
 }

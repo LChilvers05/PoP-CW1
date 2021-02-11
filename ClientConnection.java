@@ -6,18 +6,23 @@ import java.net.Socket;
 
 class ClientConnection implements Runnable {
 
-  private Socket clientSocket;
+  Socket clientSocket;
 
   InputStreamReader clientCharStream;
   BufferedReader clientIn;
   PrintWriter clientOut;
 
+  ChatQueue chatQueue;
+
+  SendToAll sendToAll;
+
   /**
    * for handling client connections on a separate thread
    * @param clientSocket
    */
-  public ClientConnection(Socket clientSocket) {
+  public ClientConnection(Socket clientSocket, ChatQueue chatQueue) {
     this.clientSocket = clientSocket;
+    this.chatQueue = chatQueue;
   }
 
   /**
@@ -35,6 +40,18 @@ class ClientConnection implements Runnable {
     }
   }
 
+  //maybe move into server class
+  public void write() {
+    try {
+      //to send data to the client
+      PrintWriter clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
+      //send to client
+      clientOut.println(chatQueue.next());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   @Override
   public void run() {
     try {
@@ -42,19 +59,17 @@ class ClientConnection implements Runnable {
       clientCharStream = new InputStreamReader(clientSocket.getInputStream());
       clientIn = new BufferedReader(clientCharStream);
 
-      //to send data to the client
-      clientOut = new PrintWriter (clientSocket.getOutputStream(), true);
-
       while(true) {
         //read from client
-        String in = clientIn.readLine();
-        if (in == null) {
+        String msg = clientIn.readLine();
+        if (msg == null) {
           break;
         }
-
-        //send to client
-        //TODO: use script class
-        clientOut.println("MESSAGE BACK");
+        synchronized(chatQueue) {
+          chatQueue.enqueue(msg);
+          //delegate method call
+          sendToAll.sendToAll();
+        }
       }
 
     } catch (IOException e) {
