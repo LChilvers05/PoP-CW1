@@ -25,7 +25,7 @@ class ArgHandler {
         } else if (portFlag) {
           portFlag = false;
           try {
-            int portCheck = Integer.parseInt(arg);
+            Integer.parseInt(arg);
             addressPort[1] = arg;
           } catch (NumberFormatException e) {
             // e.printStackTrace();
