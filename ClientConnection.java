@@ -13,8 +13,9 @@ class ClientConnection implements Runnable {
   PrintWriter clientOut;
 
   ChatQueue chatQueue;
-
   SendToAll sendToAll;
+
+  private String clientID;
 
   /**
    * for handling client connections on a separate thread
@@ -34,21 +35,20 @@ class ClientConnection implements Runnable {
       clientIn.close();
       clientOut.close();
       clientSocket.close();
+      ChatServer.println(clientSocket.getPort() + " disconnected");
 
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
-  //maybe move into server class
-  public void write() {
-    try {
-      //to send data to the client
-      PrintWriter clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
-      //send to client
-      clientOut.println(chatQueue.next());
-    } catch (IOException e) {
-      e.printStackTrace();
+  //format the message
+  public void write(String sender) {
+    //do not send to self
+    if (!sender.equals(clientID)) {
+      String msg = sender + ";" + chatQueue.next();
+      // send to client
+      clientOut.println(msg);
     }
   }
 
@@ -59,16 +59,22 @@ class ClientConnection implements Runnable {
       clientCharStream = new InputStreamReader(clientSocket.getInputStream());
       clientIn = new BufferedReader(clientCharStream);
 
+      //to send data to the client
+      clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
+
+      setClientID(clientIn.readLine());
+
       while(true) {
         //read from client
         String msg = clientIn.readLine();
-        if (msg == null) {
+        if (msg == null) { //or request to leave
           break;
         }
         synchronized(chatQueue) {
+          //add to chat queue
           chatQueue.enqueue(msg);
-          //delegate method call
-          sendToAll.sendToAll();
+          //request server to send to all clients
+          sendToAll.sendToAll(clientID);
         }
       }
 
@@ -78,5 +84,9 @@ class ClientConnection implements Runnable {
     } finally {
       closeClientSocket();
     }
+  }
+
+  public void setClientID(String name) {
+    clientID = clientSocket.getPort() + "," + name;
   }
 }

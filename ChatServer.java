@@ -72,11 +72,11 @@ class ChatServer implements SendToAll {
     }
   }
 
-  public void sendToAll() {
+  public void sendToAll(String sender) {
     //for all client connections
     for (ClientConnection client : clients) {
       //write the latest message in chat
-      client.write();
+      client.write(sender);
     }
     //done with message, release it
     chatQueue.dequeue();

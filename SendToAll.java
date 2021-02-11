@@ -1,3 +1,3 @@
 interface SendToAll {
-  public void sendToAll();
+  public void sendToAll(String sender);
 }
