@@ -35,7 +35,7 @@ class ChatServer implements SendToAll {
   /**
    * closes server socket connection
    */
-  private void stopServer() { //synchronized?
+  private void stopServer() {
     running = false;
     try {
       socket.close();

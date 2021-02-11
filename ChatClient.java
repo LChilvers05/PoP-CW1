@@ -41,21 +41,15 @@ class ChatClient {
       //to send data to server
       PrintWriter serverOut = new PrintWriter(socket.getOutputStream(), true);
 
+      //start new server connection thread to read messages
       ServerConnection server = new ServerConnection(socket);
       Thread serverThread = new Thread(server);
       serverThread.start();
-
-      // //to read data from server
-      // BufferedReader serverIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
       while(true) {
         //send request
         String userInputStr = userInput.readLine();
         serverOut.println(userInputStr);
-
-        // //print response
-        // String serverResponse = serverIn.readLine();
-        // println(serverResponse);
       }
 
     } catch (IOException e) {
