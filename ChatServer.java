@@ -1,13 +1,19 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.LinkedList;
 
-class ChatServer {
+class ChatServer implements SendToAll {
 
   private ServerSocket socket;
   private boolean running = false;
 
+  private LinkedList<ClientConnection> clients = new LinkedList<>();
+  private ChatQueue chatQueue;
+
   public ChatServer(int port) {
+    chatQueue = new ChatQueue(new LinkedList<String>());
+
     openSocket(port);
   }
 
@@ -48,8 +54,12 @@ class ChatServer {
         println("Connection on: " + socket.getLocalPort() + " ; " + clientSocket.getPort());
 
         //create and start new thread for this client
-        ClientConnection client = new ClientConnection(clientSocket);
+        ClientConnection client = new ClientConnection(clientSocket, chatQueue);
+        client.sendToAll = this;
         Thread clientThread = new Thread(client);
+        synchronized (clients) {
+          clients.add(client);
+        }
         clientThread.start();
       }
 
@@ -60,6 +70,16 @@ class ChatServer {
       //close if stop running requested
       stopServer();
     }
+  }
+
+  public void sendToAll() {
+    //for all client connections
+    for (ClientConnection client : clients) {
+      //write the latest message in chat
+      client.write();
+    }
+    //done with message, release it
+    chatQueue.dequeue();
   }
 
   public static void main(String[] args) {
