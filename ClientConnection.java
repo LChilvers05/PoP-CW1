@@ -40,9 +40,10 @@ class ClientConnection implements Runnable {
     }
   }
 
+  //maybe move into server class
   public void write() {
     try {
-        //to send data to the client
+      //to send data to the client
       PrintWriter clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
       //send to client
       clientOut.println(chatQueue.next());
