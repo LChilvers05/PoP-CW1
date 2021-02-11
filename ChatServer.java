@@ -48,7 +48,7 @@ class ChatServer {
         println("Connection on: " + socket.getLocalPort() + " ; " + clientSocket.getPort());
 
         //create and start new thread for this client
-        ClientHandler client = new ClientHandler(clientSocket);
+        ClientConnection client = new ClientConnection(clientSocket);
         Thread clientThread = new Thread(client);
         clientThread.start();
       }
@@ -63,7 +63,8 @@ class ChatServer {
   }
 
   public static void main(String[] args) {
-    ChatServer chatServer = new ChatServer(PortHelper.getPort(args));
+    int portArg = Integer.parseInt(ArgHandler.getAddressAndPort(args)[1]);
+    ChatServer chatServer = new ChatServer(portArg);
     chatServer.startServer();
   }
 
