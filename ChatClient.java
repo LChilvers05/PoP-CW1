@@ -5,6 +5,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+
+//NOTES: try closeSocket()
+//causes socket exception (this is extra not on spec)
 class ChatClient {
 
   private Socket socket;
@@ -69,8 +72,8 @@ class ChatClient {
       serverThread.start();
 
       while(true) {
-        //send input to server
         String userInputStr = userInput.readLine();
+        //send input to server
         serverOut.println(userInputStr);
       }
 

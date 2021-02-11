@@ -8,12 +8,11 @@ class ClientConnection implements Runnable {
 
   Socket clientSocket;
 
-  InputStreamReader clientCharStream;
   BufferedReader clientIn;
   PrintWriter clientOut;
 
   ChatQueue chatQueue;
-  SendToAll sendToAll;
+  ClientsDelegate clientDelegate;
 
   private String clientID;
 
@@ -31,10 +30,10 @@ class ClientConnection implements Runnable {
    */
   private void closeClientSocket() {
     try {
-      clientCharStream.close();
       clientIn.close();
       clientOut.close();
       clientSocket.close();
+      clientDelegate.forgetClient(clientID);
       ChatServer.println(clientSocket.getPort() + " disconnected");
 
     } catch (IOException e) {
@@ -56,8 +55,7 @@ class ClientConnection implements Runnable {
   public void run() {
     try {
       //to read data from the client
-      clientCharStream = new InputStreamReader(clientSocket.getInputStream());
-      clientIn = new BufferedReader(clientCharStream);
+      clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
       //to send data to the client
       clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -74,7 +72,7 @@ class ClientConnection implements Runnable {
           //add to chat queue
           chatQueue.enqueue(msg);
           //request server to send to all clients
-          sendToAll.sendToAll(clientID);
+          clientDelegate.sendToAll(clientID);
         }
       }
 
@@ -84,6 +82,10 @@ class ClientConnection implements Runnable {
     } finally {
       closeClientSocket();
     }
+  }
+
+  public String getClientID() {
+    return clientID;
   }
 
   public void setClientID(String name) {
