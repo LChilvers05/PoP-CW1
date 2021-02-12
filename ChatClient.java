@@ -1,21 +1,10 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.net.UnknownHostException;
 
-
-//NOTES: try closeSocket()
-//causes socket exception (this is extra not on spec)
-class ChatClient implements DisconnectDelegate {
-
-  private Socket socket;
-  // private boolean connected = false;
+class ChatClient extends Client implements ConnectionDelegate {
 
   BufferedReader userInput;
-
-  private String clientName;
 
   public ChatClient(String address, int port) {
     //to read the user input from console
@@ -24,36 +13,6 @@ class ChatClient implements DisconnectDelegate {
     try {
       clientName = userInput.readLine();
       openSocket(address, port);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * open socket to server with address and port
-   * @param address
-   * @param port
-   */
-  private void openSocket(String address, int port) {
-    try {
-      socket = new Socket(address, port);
-
-    } catch (UnknownHostException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * close the server connection
-   */
-  private void closeSocket() {
-    try {
-      socket.close();
-      
-      println("Goodbye " + clientName);
-
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -68,17 +27,13 @@ class ChatClient implements DisconnectDelegate {
     }
   }
 
+  @Override
   public void connect() {
+    super.connect();
     try {
-      //to send data to server
-      PrintWriter serverOut = new PrintWriter(socket.getOutputStream(), true);
-
-      //inform server of client name
-      serverOut.println(clientName);
-
       //start new server connection thread to read messages
-      ServerConnection server = new ServerConnection(socket, serverOut);
-      server.disconnectDelegate = this;
+      ServerConnection server = new ServerConnection(socket);
+      server.connectionDelegate = this;
       Thread serverThread = new Thread(server);
       serverThread.start();
 
@@ -104,8 +59,7 @@ class ChatClient implements DisconnectDelegate {
     ChatClient chatClient = new ChatClient(addArg, portArg);
     chatClient.connect();
   }
-  //helper functions
-  public static void println(String msg) {
-    System.out.println(msg);
-  }
+
+  @Override
+  public void replyToMessage(String msg) {}
 }
