@@ -7,9 +7,11 @@ import java.util.LinkedList;
 
 class ChatServer implements ClientsDelegate {
 
-  private ServerSocket socket;
+  private ServerSocket serverSocket;
+  private boolean running = false;
 
   private LinkedList<ClientConnection> clients = new LinkedList<>();
+  private LinkedList<Thread> threads = new LinkedList<>();
   private ChatQueue chatQueue;
 
   public ChatServer(int port) {
@@ -20,32 +22,44 @@ class ChatServer implements ClientsDelegate {
 
   @Override
   public void forgetClient(String clientID) {
-    for (int i = 0; i < clients.size(); i++) {
-      if (clients.get(i).getClientID().equals(clientID)) {
-        clients.remove(i);
-        break;
+    synchronized (clients) {
+      ClientConnection foundClient = null;
+      for (ClientConnection client : clients) {
+        if (client.getClientID().equals(clientID)) {
+          foundClient = client;
+          break;
+        }
+      }
+      if (foundClient != null) {
+        clients.remove(foundClient);
       }
     }
   }
 
   @Override
   public void sendToAll(String sender) {
-    //for all client connections
+    // for all client connections
     for (ClientConnection client : clients) {
-      //write the latest message in chat
+      // write the latest message in chat
       client.write(sender);
     }
-    //done with message, release it
+    // done with message, release it
     chatQueue.dequeue();
+  }
+
+  private void disconnectClients() {
+    //TODO: how to disconnect clients
   }
 
   /**
    * open the server socket connection
+   * 
    * @param port
    */
   private void openSocket(int port) {
     try {
-      socket = new ServerSocket(port);
+      serverSocket = new ServerSocket(port);
+      running = true;
       println("Server started");
 
     } catch (IOException e) {
@@ -58,8 +72,8 @@ class ChatServer implements ClientsDelegate {
    */
   private void stopServer() {
     try {
-      socket.close();
-
+      running = false;
+      serverSocket.close();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -68,15 +82,16 @@ class ChatServer implements ClientsDelegate {
   public void startServer() {
     try {
       //continuously get client connections
-      while(true) {
+      while(running) {
         //accept client connection
-        Socket clientSocket = socket.accept();
-        println("Connection on: " + socket.getLocalPort() + " ; " + clientSocket.getPort());
+        Socket clientSocket = serverSocket.accept();
+        println("Connection on: " + serverSocket.getLocalPort() + " ; " + clientSocket.getPort());
 
         //create and start new thread for this client
         ClientConnection client = new ClientConnection(clientSocket, chatQueue);
         client.clientDelegate = this;
         Thread clientThread = new Thread(client);
+        threads.add(clientThread);
         synchronized (clients) {
           clients.add(client);
         }
@@ -84,11 +99,7 @@ class ChatServer implements ClientsDelegate {
       }
 
     } catch (IOException e) {
-      e.printStackTrace();
-
-    } finally {
-      //close if stop running requested
-      stopServer();
+      disconnectClients();
     }
   }
   
@@ -101,7 +112,7 @@ class ChatServer implements ClientsDelegate {
             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
             String cmd = userInput.readLine();
             if (cmd.toUpperCase().equals("EXIT")) {
-              println("TODO: STOP THE SERVER");
+              stopServer();
               break;
             }
           }

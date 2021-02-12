@@ -16,6 +16,8 @@ class ClientConnection implements Runnable {
 
   private String clientID;
 
+  boolean isConnected = true;
+
   /**
    * for handling client connections on a separate thread
    * @param clientSocket
@@ -28,11 +30,12 @@ class ClientConnection implements Runnable {
   /**
    * close the client connection
    */
-  private void closeClientSocket() {
+  public void closeClientSocket() {
     try {
+      isConnected = false;
+      clientSocket.close();
       clientIn.close();
       clientOut.close();
-      clientSocket.close();
       clientDelegate.forgetClient(clientID);
       ChatServer.println(clientSocket.getPort() + " disconnected");
 
@@ -62,10 +65,10 @@ class ClientConnection implements Runnable {
 
       setClientID(clientIn.readLine());
 
-      while(true) {
+      while(isConnected) {
         //read from client
         String msg = clientIn.readLine();
-        if (msg == null) { //or request to leave
+        if (msg == null) {
           break;
         }
         synchronized(chatQueue) {
@@ -77,10 +80,12 @@ class ClientConnection implements Runnable {
       }
 
     } catch (IOException e) {
-      e.printStackTrace();
-
+      System.out.println("REACHED HERE");
+      
     } finally {
-      closeClientSocket();
+      if (isConnected) {
+        closeClientSocket();
+      }
     }
   }
 
