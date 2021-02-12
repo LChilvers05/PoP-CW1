@@ -20,37 +20,6 @@ class ChatServer implements ClientsDelegate {
     startConsoleListener();
   }
 
-  @Override
-  public void forgetClient(String clientID) {
-    synchronized (clients) {
-      ClientConnection foundClient = null;
-      for (ClientConnection client : clients) {
-        if (client.getClientID().equals(clientID)) {
-          foundClient = client;
-          break;
-        }
-      }
-      if (foundClient != null) {
-        clients.remove(foundClient);
-      }
-    }
-  }
-
-  @Override
-  public void sendToAll(String sender) {
-    // for all client connections
-    for (ClientConnection client : clients) {
-      // write the latest message in chat
-      client.write(sender);
-    }
-    // done with message, release it
-    chatQueue.dequeue();
-  }
-
-  private void disconnectClients() {
-    //TODO: how to disconnect clients
-  }
-
   /**
    * open the server socket connection
    * 
@@ -99,11 +68,13 @@ class ChatServer implements ClientsDelegate {
       }
 
     } catch (IOException e) {
+      println("Server socket closed");
+    } finally {
       disconnectClients();
     }
   }
   
-  //input to console to stop server with anonymous method
+  //input to console to stop server with anonymous
   public void startConsoleListener() {
     Thread stopperThread = new Thread() {
       public void run() {
@@ -122,6 +93,45 @@ class ChatServer implements ClientsDelegate {
       }
     };
     stopperThread.start();
+  }
+
+  //MARK: ClientsDelegate methods
+
+  @Override
+  public void forgetClient(String clientID) {
+    synchronized (clients) {
+      ClientConnection foundClient = null;
+      for (ClientConnection client : clients) {
+        if (client.getClientID().equals(clientID)) {
+          foundClient = client;
+          break;
+        }
+      }
+      if (foundClient != null) {
+        clients.remove(foundClient);
+      }
+    }
+  }
+
+  @Override
+  public void sendToAllClients(String sender) {
+    // for all client connections
+    for (ClientConnection client : clients) {
+      // write the latest message in chat
+      client.write(sender);
+    }
+    // done with message, release it
+    chatQueue.dequeue();
+  }
+
+  @Override
+  public void disconnectClients() {
+    synchronized(clients) {
+      for (ClientConnection client : clients) {
+        // request all clients to disconnect
+        client.sendDisconnectRequest();
+      }
+    }
   }
 
   public static void main(String[] args) {

@@ -33,9 +33,9 @@ class ClientConnection implements Runnable {
   public void closeClientSocket() {
     try {
       isConnected = false;
-      clientSocket.close();
       clientIn.close();
       clientOut.close();
+      clientSocket.close();
       clientDelegate.forgetClient(clientID);
       ChatServer.println(clientSocket.getPort() + " disconnected");
 
@@ -52,6 +52,10 @@ class ClientConnection implements Runnable {
       // send to client
       clientOut.println(msg);
     }
+  }
+
+  public void sendDisconnectRequest() {
+    clientOut.println("SERVER_SHUTDOWN");
   }
 
   @Override
@@ -75,17 +79,14 @@ class ClientConnection implements Runnable {
           //add to chat queue
           chatQueue.enqueue(msg);
           //request server to send to all clients
-          clientDelegate.sendToAll(clientID);
+          clientDelegate.sendToAllClients(clientID);
         }
       }
 
     } catch (IOException e) {
-      System.out.println("REACHED HERE");
-      
+      e.printStackTrace();
     } finally {
-      if (isConnected) {
-        closeClientSocket();
-      }
+      closeClientSocket();
     }
   }
 

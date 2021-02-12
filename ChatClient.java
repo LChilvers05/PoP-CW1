@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 
 //NOTES: try closeSocket()
 //causes socket exception (this is extra not on spec)
-class ChatClient {
+class ChatClient implements DisconnectDelegate {
 
   private Socket socket;
   // private boolean connected = false;
@@ -51,8 +51,18 @@ class ChatClient {
   private void closeSocket() {
     try {
       socket.close();
+      
       println("Goodbye " + clientName);
 
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+  
+  @Override
+  public void disconnect() {
+    try {
+      userInput.close();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -67,19 +77,22 @@ class ChatClient {
       serverOut.println(clientName);
 
       //start new server connection thread to read messages
-      ServerConnection server = new ServerConnection(socket);
+      ServerConnection server = new ServerConnection(socket, serverOut);
+      server.disconnectDelegate = this;
       Thread serverThread = new Thread(server);
       serverThread.start();
 
       while(true) {
         String userInputStr = userInput.readLine();
+        if (userInputStr == null) {
+          break;
+        }
         //send input to server
         serverOut.println(userInputStr);
       }
 
     } catch (IOException e) {
-      e.printStackTrace();
-
+      println("Disconnected from Server");
     } finally {
       closeSocket();
     }
