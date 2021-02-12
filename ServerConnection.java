@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 /**
@@ -13,8 +14,15 @@ public class ServerConnection implements Runnable {
 
   BufferedReader serverIn;
 
-  public ServerConnection (Socket serverSocket) {
+  DisconnectDelegate disconnectDelegate;
+
+  public ServerConnection (Socket serverSocket, PrintWriter serverOut) {
     this.serverSocket = serverSocket;
+  }
+
+  
+  public static String getClientName(String clientID) {
+    return clientID.split(",")[1];
   }
 
   private String formatMessage(String response) {
@@ -22,6 +30,15 @@ public class ServerConnection implements Runnable {
     String name = getClientName(splitResponse[0]);
     String msg = splitResponse[1];
     return name + ": " + msg;
+  }
+
+  private void disconnect() {
+    try {
+      serverIn.close();
+      disconnectDelegate.disconnect();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -34,6 +51,10 @@ public class ServerConnection implements Runnable {
       while(true) {
         //response = clientID: message
         String response = serverIn.readLine();
+        //server shut down, disconnect client
+        if (response.equals("SERVER_SHUTDOWN")) {
+          break;
+        }
         String msg = formatMessage(response);
 
         ChatClient.println(msg);
@@ -41,10 +62,9 @@ public class ServerConnection implements Runnable {
   
     } catch (IOException e) {
       e.printStackTrace();
-    }
-  }
 
-  public static String getClientName(String clientID) {
-    return clientID.split(",")[1];
+    } finally {
+      disconnect();
+    }
   }
 }

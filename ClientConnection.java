@@ -16,6 +16,8 @@ class ClientConnection implements Runnable {
 
   private String clientID;
 
+  boolean isConnected = true;
+
   /**
    * for handling client connections on a separate thread
    * @param clientSocket
@@ -28,8 +30,9 @@ class ClientConnection implements Runnable {
   /**
    * close the client connection
    */
-  private void closeClientSocket() {
+  public void closeClientSocket() {
     try {
+      isConnected = false;
       clientIn.close();
       clientOut.close();
       clientSocket.close();
@@ -51,6 +54,10 @@ class ClientConnection implements Runnable {
     }
   }
 
+  public void sendDisconnectRequest() {
+    clientOut.println("SERVER_SHUTDOWN");
+  }
+
   @Override
   public void run() {
     try {
@@ -62,23 +69,22 @@ class ClientConnection implements Runnable {
 
       setClientID(clientIn.readLine());
 
-      while(true) {
+      while(isConnected) {
         //read from client
         String msg = clientIn.readLine();
-        if (msg == null) { //or request to leave
+        if (msg == null) {
           break;
         }
         synchronized(chatQueue) {
           //add to chat queue
           chatQueue.enqueue(msg);
           //request server to send to all clients
-          clientDelegate.sendToAll(clientID);
+          clientDelegate.sendToAllClients(clientID);
         }
       }
 
     } catch (IOException e) {
       e.printStackTrace();
-
     } finally {
       closeClientSocket();
     }
