@@ -4,6 +4,7 @@ interface ClientsDelegate {
   public void disconnectClients();
 }
 
-interface DisconnectDelegate {
+interface ConnectionDelegate {
   public void disconnect();
+  public void replyToMessage(String msg);
 }
