@@ -1,22 +1,18 @@
+package Project;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-/**
- * create a new thread for server connection for each chat client
- * handles reading messages sent from server
- */
-public class ServerConnection extends Connection implements Runnable {
+public class BotConnection extends Connection {
 
-  public ServerConnection (Socket serverSocket) {
+  public BotConnection (Socket serverSocket) {
     super(serverSocket);
   }
 
-  @Override
-  public void run() {
+  public void listen() {
     try {
-      //to read data from server
       serverIn = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 
       while(true) {
@@ -27,10 +23,9 @@ public class ServerConnection extends Connection implements Runnable {
           break;
         }
         String msg = formatMessage(response);
-
-        ChatClient.println(msg);
+        connectionDelegate.replyToMessage(msg);
       }
-  
+      
     } catch (IOException e) {
       e.printStackTrace();
 
