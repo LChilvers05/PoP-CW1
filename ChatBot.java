@@ -1,3 +1,4 @@
+// figure out if this can run as java ChatBot
 public class ChatBot extends Client implements ConnectionDelegate {
 
   MessageHandler msgHandler = new MessageHandler();
