@@ -1,4 +1,4 @@
-// figure out if this can run as java ChatBot
+// figure out if this can run as java ChatBot have its own main
 public class ChatBot extends Client implements ConnectionDelegate {
 
   MessageHandler msgHandler = new MessageHandler();
