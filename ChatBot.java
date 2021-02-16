@@ -13,7 +13,7 @@ public class ChatBot extends Client implements ConnectionDelegate {
   public void replyToMessage(String msg) {
     try {
       //simulate typing...|
-      Thread.sleep(2500);
+      Thread.sleep(2000);
       serverOut.println(msgHandler.getReply(msg));
     } catch (InterruptedException e) {
       e.printStackTrace();
@@ -28,13 +28,6 @@ public class ChatBot extends Client implements ConnectionDelegate {
     BotConnection bot = new BotConnection(socket);
     bot.connectionDelegate = this;
     bot.listen();
-  }
-
-  public static void main(String[] args) {
-    String addArg = ArgHandler.getAddressAndPort(args)[0];
-    int portArg = Integer.parseInt(ArgHandler.getAddressAndPort(args)[1]);
-    ChatBot chatBot = new ChatBot(addArg, portArg);
-    chatBot.connect();
   }
 
   @Override

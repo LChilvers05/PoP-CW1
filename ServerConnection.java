@@ -28,7 +28,7 @@ public class ServerConnection extends Connection implements Runnable {
         }
         String msg = formatMessage(response);
 
-        ChatClient.println(msg);
+        ChatUser.println(msg);
       }
   
     } catch (IOException e) {

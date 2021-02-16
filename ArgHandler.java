@@ -1,45 +1,54 @@
-// improve
+import java.io.IOException;
+import java.net.Socket;
+import java.util.List;
+
 class ArgHandler {
 
-  /**
-   * gets the address and/or port to be used on program run
-   * @param args from console (-cca address -csp port)
-   * @return [address, port]
-   */
-  public static String[] getAddressAndPort(String[] args) {
-    //default
-    String[] addressPort = {"localhost", "14001"};
-    //check the arguments, if any in format
-    //-cca address
-    //-csp port
-    if (args.length == 2 || args.length == 4) {
-      boolean addressFlag = false;
-      boolean portFlag = false;
-      for (String arg : args) {
+  public static String getAddress(List<String> args) {
 
-        //address specified update default
-        if (addressFlag) {
-          addressFlag = false;
-          addressPort[0] = arg;
-        
-        //port specified
-        } else if (portFlag) {
-          portFlag = false;
-          try {
-            Integer.parseInt(arg);
-            addressPort[1] = arg;
-          } catch (NumberFormatException e) {
-            System.out.println("Error - using default port 14001");
-          }
-          
-        } else if (arg.equals("-csp")) {
-          portFlag = true;
-
-        } else if (arg.equals("-cca")) {
-          addressFlag = true;
+    try {
+      if (args.contains("-cca")) {
+        int i = args.indexOf("-cca");
+        String address = args.get(i + 1);
+        try (Socket test = new Socket(address, 14001)) {
+          return address;
+        } catch (IOException e) {
+          System.out.println("Bad address given, using localhost");
         }
       }
+    } catch (IndexOutOfBoundsException e) {
+      System.out.println("No address given despite command, using localhost");
     }
-    return addressPort;
+
+    return "localhost";
+  }
+
+  public static int getPort(List<String> args) {
+    try {
+      if (args.contains("-csp")) {
+        int i = args.indexOf("-csp");
+        int port = Integer.parseInt(args.get(i + 1));
+        //TODO: check port
+        return port;
+      }
+    } catch (IndexOutOfBoundsException e) {
+      System.out.println("No port given despite command, using 14001");
+    } catch (NumberFormatException e) {
+      System.out.println("Bad port given, using 14001");
+    }
+
+    return 14001;
+  }
+
+  public static Client getClient(List<String> args, String address, int port) {
+
+    if (args.contains("-botclient")) {
+      return new ChatBot(address, port);
+    }
+
+    //TODO: -dodclient
+
+
+    return new ChatUser(address, port);
   }
 }
