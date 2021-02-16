@@ -1,3 +1,5 @@
+package Project;
+
 import java.util.LinkedList;
 
 class ChatQueue {
