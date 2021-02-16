@@ -1,5 +1,3 @@
-package Project;
-
 import java.util.Random;
 
 public class MessageHandler {
