@@ -1,5 +1,3 @@
-package Project;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -36,7 +34,7 @@ abstract class Client {
     try {
       socket.close();
       
-      println("Goodbye " + clientName);
+      println("Goodbye " + clientName + ".");
 
     } catch (IOException e) {
       e.printStackTrace();

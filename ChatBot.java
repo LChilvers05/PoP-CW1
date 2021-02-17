@@ -1,8 +1,7 @@
-package Project;
+/**bot that simply replies to messages */
+public class ChatBot extends Client implements ReplyDelegate {
 
-// figure out if this can run as java ChatBot have its own main
-public class ChatBot extends Client implements ConnectionDelegate {
-
+  /**for scripted reply to messages */
   MessageHandler msgHandler = new MessageHandler();
 
   public ChatBot(String address, int port) {
@@ -11,11 +10,13 @@ public class ChatBot extends Client implements ConnectionDelegate {
     openSocket(address, port);
   }
 
+  /**send scripted messages */
   @Override
   public void replyToMessage(String msg) {
     try {
       //simulate typing...|
-      Thread.sleep(2500);
+      Thread.sleep(2000);
+      //send scripted message using MessageHandler
       serverOut.println(msgHandler.getReply(msg));
     } catch (InterruptedException e) {
       e.printStackTrace();
@@ -25,20 +26,9 @@ public class ChatBot extends Client implements ConnectionDelegate {
   @Override
   public void connect() {
     super.connect();
-    
-    //start new server connection
+    //start new server connection (not a thread)
     BotConnection bot = new BotConnection(socket);
-    bot.connectionDelegate = this;
+    bot.replyDelegate = this;
     bot.listen();
   }
-
-  public static void main(String[] args) {
-    String addArg = ArgHandler.getAddressAndPort(args)[0];
-    int portArg = Integer.parseInt(ArgHandler.getAddressAndPort(args)[1]);
-    ChatBot chatBot = new ChatBot(addArg, portArg);
-    chatBot.connect();
-  }
-
-  @Override
-  public void disconnect() {}
 }

@@ -1,47 +1,75 @@
-package Project;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.List;
 
-// improve
 class ArgHandler {
 
   /**
-   * gets the address and/or port to be used on program run
-   * @param args from console (-cca address -csp port)
-   * @return [address, port]
+   * process argument to specify address
+   * @param args arguments passed in
+   * @return address specified, localhost or error
    */
-  public static String[] getAddressAndPort(String[] args) {
-    //default
-    String[] addressPort = {"localhost", "14001"};
-    //check the arguments, if any in format
-    //-cca address
-    //-csp port
-    if (args.length == 2 || args.length == 4) {
-      boolean addressFlag = false;
-      boolean portFlag = false;
-      for (String arg : args) {
+  public static String getAddress(List<String> args) {
 
-        //address specified update default
-        if (addressFlag) {
-          addressFlag = false;
-          addressPort[0] = arg;
-        
-        //port specified
-        } else if (portFlag) {
-          portFlag = false;
-          try {
-            Integer.parseInt(arg);
-            addressPort[1] = arg;
-          } catch (NumberFormatException e) {
-            System.out.println("Error - using default port 14001");
-          }
-          
-        } else if (arg.equals("-csp")) {
-          portFlag = true;
-
-        } else if (arg.equals("-cca")) {
-          addressFlag = true;
+    try {
+      if (args.contains("-cca")) {
+        int i = args.indexOf("-cca");
+        String address = args.get(i + 1);
+        try (Socket test = new Socket(address, 14001)) {
+          return address;
+        } catch (IOException e) {
+          System.out.println("Closing due to bad address given.");
         }
+      } else {
+        return "localhost";
       }
+    } catch (IndexOutOfBoundsException e) {
+      System.out.println("Closing due to no address given despite command.");
     }
-    return addressPort;
+
+    return "error";
+  }
+
+  /**
+   * process argument to specify port
+   * @param args arguments passed in
+   * @return port specified, 14001 or -1 (error)
+   */
+  public static int getPort(List<String> args) {
+    try {
+      if (args.contains("-csp")) {
+        int i = args.indexOf("-csp");
+        int port = Integer.parseInt(args.get(i + 1));
+        return port;
+      } else {
+        return 14001;
+      }
+    } catch (IndexOutOfBoundsException e) {
+      System.out.println("Closing due to no port given despite command.");
+    } catch (NumberFormatException e) {
+      System.out.println("Closing due to bad port given.");
+    }
+
+    return -1;
+  }
+
+  /**
+   * 
+   * @param args arguments passed in
+   * @param address valid address to instantiate client
+   * @param port valid port to instantiate client
+   * @return
+   */
+  public static Client getClient(List<String> args, String address, int port) {
+
+    //create bot
+    if (args.contains("-bot")) {
+      return new ChatBot(address, port);
+    }
+
+    //TODO:create a dod
+
+    //user is default
+    return new ChatUser(address, port);
   }
 }

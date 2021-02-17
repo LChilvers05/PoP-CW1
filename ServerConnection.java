@@ -1,20 +1,24 @@
-package Project;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-/**
- * create a new thread for server connection for each chat client
- * handles reading messages sent from server
- */
+/**listens to server in separate thread and outputs to user */
 public class ServerConnection extends Connection implements Runnable {
 
   public ServerConnection (Socket serverSocket) {
     super(serverSocket);
   }
 
+  @Override
+  public void closeReaders() {
+    super.closeReaders();
+    closer.closeReaders();
+  }
+
+  /**
+   * reads server input and outputs to console
+   */
   @Override
   public void run() {
     try {
@@ -26,18 +30,19 @@ public class ServerConnection extends Connection implements Runnable {
         String response = serverIn.readLine();
         //server shut down, disconnect client
         if (response.equals("SERVER_SHUTDOWN")) {
+          ChatUser.println("Server Stopped.");
           break;
         }
         String msg = formatMessage(response);
-
-        ChatClient.println(msg);
+        //output formatted message
+        ChatUser.println(msg);
       }
   
     } catch (IOException e) {
       e.printStackTrace();
 
     } finally {
-      disconnect();
+      closeReaders();
     }
   }
 }

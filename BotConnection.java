@@ -1,16 +1,20 @@
-package Project;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
+/**listens to server and tells ChatBot to reply*/
 public class BotConnection extends Connection {
+
+  ReplyDelegate replyDelegate;
 
   public BotConnection (Socket serverSocket) {
     super(serverSocket);
   }
 
+  /**
+   * reads server input and informs ChatBot
+   */
   public void listen() {
     try {
       serverIn = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
@@ -23,14 +27,15 @@ public class BotConnection extends Connection {
           break;
         }
         String msg = formatMessage(response);
-        connectionDelegate.replyToMessage(msg);
+        //get ChatBot to reply to the message
+        replyDelegate.replyToMessage(msg);
       }
       
     } catch (IOException e) {
       e.printStackTrace();
 
     } finally {
-      disconnect();
+      closeReaders();
     }
   }
 }
