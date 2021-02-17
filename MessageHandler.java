@@ -2,6 +2,11 @@ import java.util.Random;
 
 public class MessageHandler {
 
+  /**
+   * decide how to decide to message
+   * @param msg message to reply to
+   * @return reply message
+   */
   public String getReply(String msg) {
     String upMsg = msg.toUpperCase();
 
@@ -27,6 +32,8 @@ public class MessageHandler {
       return noUnderstand();
     }
   }
+
+  //choose random response in context
 
   private String greeting() {
     String[] array = {"Hello!", "Hello there", "Howdy", "Hey"};
