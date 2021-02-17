@@ -12,8 +12,7 @@ class ChatServer implements ClientsDelegate {
   private ServerSocket serverSocket;
   private boolean running = false;
 
-  private LinkedList<ClientConnection> clients = new LinkedList<>();
-  private LinkedList<Thread> threads = new LinkedList<>();
+  private LinkedList<ChatConnection> chatClients = new LinkedList<>();
   private ChatQueue chatQueue;
 
   public ChatServer(int port) {
@@ -57,16 +56,24 @@ class ChatServer implements ClientsDelegate {
         //accept client connection
         Socket clientSocket = serverSocket.accept();
         println("Connection on: " + serverSocket.getLocalPort() + " ; " + clientSocket.getPort());
-
-        //create and start new thread for this client
-        ClientConnection client = new ClientConnection(clientSocket, chatQueue);
-        client.clientDelegate = this;
-        Thread clientThread = new Thread(client);
-        threads.add(clientThread);
-        synchronized (clients) {
-          clients.add(client);
+        BufferedReader typeIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        String type = typeIn.readLine();
+        if (type.equals("CHAT")) {
+          //create and start new thread for this client
+          ChatConnection client = new ChatConnection(clientSocket, chatQueue);
+          client.clientDelegate = this;
+          Thread clientThread = new Thread(client);
+          synchronized (chatClients) {
+            chatClients.add(client);
+          }
+          clientThread.start();
+        //"DOD"
+        } else {
+          DoDConnection client = new DoDConnection(clientSocket);
+          client.clientDelegate = this;
+          Thread clientThread = new Thread(client);
+          clientThread.start();
         }
-        clientThread.start();
       }
 
     } catch (IOException e) {
@@ -101,16 +108,16 @@ class ChatServer implements ClientsDelegate {
 
   @Override
   public void forgetClient(String clientID) {
-    synchronized (clients) {
-      ClientConnection foundClient = null;
-      for (ClientConnection client : clients) {
+    synchronized (chatClients) {
+      ChatConnection foundClient = null;
+      for (ChatConnection client : chatClients) {
         if (client.getClientID().equals(clientID)) {
           foundClient = client;
           break;
         }
       }
       if (foundClient != null) {
-        clients.remove(foundClient);
+        chatClients.remove(foundClient);
       }
     }
   }
@@ -118,7 +125,7 @@ class ChatServer implements ClientsDelegate {
   @Override
   public void sendToAllClients(String sender) {
     // for all client connections
-    for (ClientConnection client : clients) {
+    for (ChatConnection client : chatClients) {
       // write the latest message in chat
       client.write(sender);
     }
@@ -128,8 +135,8 @@ class ChatServer implements ClientsDelegate {
 
   @Override
   public void disconnectClients() {
-    synchronized(clients) {
-      for (ClientConnection client : clients) {
+    synchronized(chatClients) {
+      for (ChatConnection client : chatClients) {
         // request all clients to disconnect
         client.sendDisconnectRequest();
       }

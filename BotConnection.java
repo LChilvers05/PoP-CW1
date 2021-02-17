@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 /**listens to server and tells ChatBot to reply*/
-public class BotConnection extends Connection {
+public class BotConnection extends ClientSideConnection {
 
   ReplyDelegate replyDelegate;
 

@@ -64,12 +64,12 @@ class ArgHandler {
 
     //create bot
     if (args.contains("-bot")) {
-      return new ChatBot(address, port);
+      return new BotClient(address, port);
+
+    } else if (args.contains("-dod")) {
+      return new DoDClient(address, port);
     }
-
-    //TODO:create a dod
-
     //user is default
-    return new ChatUser(address, port);
+    return new UserClient(address, port);
   }
 }

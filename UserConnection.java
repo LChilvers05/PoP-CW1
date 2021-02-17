@@ -4,9 +4,9 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 /**listens to server in separate thread and outputs to user */
-public class ServerConnection extends Connection implements Runnable {
+public class UserConnection extends ClientSideConnection implements Runnable {
 
-  public ServerConnection (Socket serverSocket) {
+  public UserConnection (Socket serverSocket) {
     super(serverSocket);
   }
 
@@ -30,12 +30,12 @@ public class ServerConnection extends Connection implements Runnable {
         String response = serverIn.readLine();
         //server shut down, disconnect client
         if (response.equals("SERVER_SHUTDOWN")) {
-          ChatUser.println("Server Stopped.");
+          UserClient.println("Server Stopped.");
           break;
         }
         String msg = formatMessage(response);
         //output formatted message
-        ChatUser.println(msg);
+        println(msg);
       }
   
     } catch (IOException e) {

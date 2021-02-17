@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 /**inherited from to read from the server*/
-abstract class Connection {
+abstract class ClientSideConnection {
 
   Socket serverSocket;
 
@@ -13,7 +13,7 @@ abstract class Connection {
   /**to communicate with Client from Connection*/
   Closer closer;
 
-  public Connection (Socket serverSocket) {
+  public ClientSideConnection (Socket serverSocket) {
     this.serverSocket = serverSocket;
   }
 
@@ -49,5 +49,9 @@ abstract class Connection {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public static void println(String msg) {
+    System.out.println(msg);
   }
 }

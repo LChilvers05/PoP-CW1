@@ -4,47 +4,30 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-class ClientConnection implements Runnable {
-
-  Socket clientSocket;
-
-  BufferedReader clientIn;
-  PrintWriter clientOut;
+class ChatConnection extends ServerSideConnection implements Runnable {
 
   ChatQueue chatQueue;
-  ClientsDelegate clientDelegate;
-
-  private String clientID;
-
-  boolean isConnected = true;
 
   /**
    * for handling client connections on a separate thread
    * @param clientSocket
    */
-  public ClientConnection(Socket clientSocket, ChatQueue chatQueue) {
-    this.clientSocket = clientSocket;
+  public ChatConnection(Socket clientSocket, ChatQueue chatQueue) {
+    super(clientSocket);
     this.chatQueue = chatQueue;
   }
 
   /**
    * close the client connection
    */
+  @Override
   public void closeClientSocket() {
-    try {
-      isConnected = false;
-      clientIn.close();
-      clientOut.close();
-      clientSocket.close();
-      clientDelegate.forgetClient(clientID);
-      ChatServer.println(clientSocket.getPort() + " disconnected");
-
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    super.closeClientSocket();
+    clientDelegate.forgetClient(clientID);
   }
 
   //format the message
+  @Override
   public void write(String sender) {
     //do not send to self
     if (!sender.equals(clientID)) {
@@ -52,10 +35,6 @@ class ClientConnection implements Runnable {
       // send to client
       clientOut.println(msg);
     }
-  }
-
-  public void sendDisconnectRequest() {
-    clientOut.println("SERVER_SHUTDOWN");
   }
 
   @Override
@@ -88,13 +67,5 @@ class ClientConnection implements Runnable {
     } finally {
       closeClientSocket();
     }
-  }
-
-  public String getClientID() {
-    return clientID;
-  }
-
-  public void setClientID(String name) {
-    clientID = clientSocket.getPort() + "," + name;
   }
 }

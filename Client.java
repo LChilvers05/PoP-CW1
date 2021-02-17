@@ -45,8 +45,6 @@ abstract class Client {
     try {
       //to send data to server
       serverOut = new PrintWriter(socket.getOutputStream(), true);
-      //inform server of client name
-      serverOut.println(clientName);
     } catch (IOException e) {
       e.printStackTrace();
     }
