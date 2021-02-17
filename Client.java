@@ -9,7 +9,7 @@ abstract class Client {
 
   PrintWriter serverOut;
 
-  String clientName;
+  String ID;
 
   /**
    * open socket to server with address and port
@@ -34,7 +34,7 @@ abstract class Client {
     try {
       socket.close();
       
-      println("Goodbye " + clientName + ".");
+      println("Goodbye.");
 
     } catch (IOException e) {
       e.printStackTrace();

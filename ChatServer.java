@@ -13,6 +13,7 @@ class ChatServer implements ClientsDelegate {
   private boolean running = false;
 
   private LinkedList<ChatConnection> chatClients = new LinkedList<>();
+  private LinkedList<DoDConnection> dodClients = new LinkedList<>();
   private ChatQueue chatQueue;
 
   public ChatServer(int port) {
@@ -72,6 +73,9 @@ class ChatServer implements ClientsDelegate {
           DoDConnection client = new DoDConnection(clientSocket, clientIn);
           client.clientDelegate = this;
           Thread clientThread = new Thread(client);
+          synchronized(dodClients) {
+            dodClients.add(client);
+          }
           clientThread.start();
         }
       }
@@ -133,12 +137,16 @@ class ChatServer implements ClientsDelegate {
     chatQueue.dequeue();
   }
 
-  //TODO: DOD CLIENT NOT ADDED TO THIS LIST so not disconnected
   @Override
   public void disconnectClients() {
+    // request all clients to disconnect
     synchronized(chatClients) {
       for (ChatConnection client : chatClients) {
-        // request all clients to disconnect
+        client.sendDisconnectRequest();
+      }
+    }
+    synchronized(dodClients) {
+      for (DoDConnection client : dodClients) {
         client.sendDisconnectRequest();
       }
     }

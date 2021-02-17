@@ -5,8 +5,8 @@ import java.net.Socket;
 
 public class DoDUserConnection extends BotConnection {
 
-  public DoDUserConnection (Socket serverSocket) {
-    super(serverSocket);
+  public DoDUserConnection (Socket serverSocket, String id) {
+    super(serverSocket, id);
   }
 
   @Override

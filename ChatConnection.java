@@ -28,12 +28,9 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   //format the message
   @Override
   public void write(String sender) {
-    //do not send to self
-    if (!sender.equals(clientID)) {
-      String msg = sender + ";" + chatQueue.next();
-      // send to client
-      clientOut.println(msg);
-    }
+    String msg = sender + ";" + chatQueue.next();
+    // send to client
+    clientOut.println(msg);
   }
 
   @Override

@@ -51,12 +51,6 @@ class DoDConnection extends ServerSideConnection implements Runnable {
         logic.nextPlayer = (logic.nextPlayer == logic.p2) ? logic.p1 : logic.p2;
         //writes the result from the players command inputs
         write(logic.currentPlayer.getNextAction());
-
-        // //read game command from client
-        // String cmd = clientIn.readLine();
-        // if (cmd == null) {
-        //   break;
-        // }
       }
 
     } catch (IOException e) {

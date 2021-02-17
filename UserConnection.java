@@ -6,8 +6,8 @@ import java.net.Socket;
 /**listens to server in separate thread and outputs to user */
 public class UserConnection extends ClientSideConnection implements Runnable {
 
-  public UserConnection (Socket serverSocket) {
-    super(serverSocket);
+  public UserConnection (Socket serverSocket, String id) {
+    super(serverSocket, id);
   }
 
   @Override
@@ -33,7 +33,7 @@ public class UserConnection extends ClientSideConnection implements Runnable {
           UserClient.println("Server Stopped.");
           break;
         }
-        String msg = formatMessage(response);
+        String msg = formatMessage(response, ID);
         //output formatted message
         println(msg);
       }

@@ -8,8 +8,8 @@ public class BotConnection extends ClientSideConnection {
 
   ReplyDelegate replyDelegate;
 
-  public BotConnection (Socket serverSocket) {
-    super(serverSocket);
+  public BotConnection (Socket serverSocket, String id) {
+    super(serverSocket, id);
   }
 
   /**
@@ -26,9 +26,12 @@ public class BotConnection extends ClientSideConnection {
         if (response.equals("SERVER_SHUTDOWN")) {
           break;
         }
-        String msg = formatMessage(response);
-        //get ChatBot to reply to the message
-        replyDelegate.replyToMessage(msg);
+        //bot doesn't reply to self
+        if (!response.split(";")[0].equals(ID)) {
+          String msg = formatMessage(response, ID);
+          //get ChatBot to reply to the message
+          replyDelegate.replyToMessage(msg);
+        }
       }
       
     } catch (IOException e) {

@@ -44,6 +44,6 @@ public abstract class ServerSideConnection {
   }
 
   public void setClientID(String name) {
-    clientID = clientSocket.getPort() + "," + name;
+    clientID = name;
   }
 }

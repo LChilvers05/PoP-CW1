@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.UUID;
 
 /**client operated by a user */
 class UserClient extends Client implements Closer {
@@ -13,7 +14,7 @@ class UserClient extends Client implements Closer {
     println("> Enter chat name");
     try {
       //name to make up clientID
-      clientName = userInput.readLine();
+      ID = UUID.randomUUID().toString() + "," + userInput.readLine();
       openSocket(address, port);
     } catch (IOException e) {
       e.printStackTrace();
@@ -40,9 +41,9 @@ class UserClient extends Client implements Closer {
     super.connect();
     try {
       serverOut.println("CHAT");
-      serverOut.println(clientName);
+      serverOut.println(ID);
       //start new user connection thread to read messages
-      UserConnection server = new UserConnection(socket);
+      UserConnection server = new UserConnection(socket, ID);
       //delegation pattern so connection thread talks to UserClient
       server.closer = this;
       Thread serverThread = new Thread(server);
