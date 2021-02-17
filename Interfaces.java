@@ -4,7 +4,10 @@ interface ClientsDelegate {
   public void disconnectClients();
 }
 
-interface ConnectionDelegate {
-  public void disconnect();
+interface ReplyDelegate {
   public void replyToMessage(String msg);
+}
+
+interface Closer {
+  public void closeReaders();
 }

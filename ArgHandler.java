@@ -4,6 +4,11 @@ import java.util.List;
 
 class ArgHandler {
 
+  /**
+   * process argument to specify address
+   * @param args arguments passed in
+   * @return address specified, localhost or error
+   */
   public static String getAddress(List<String> args) {
 
     try {
@@ -13,42 +18,58 @@ class ArgHandler {
         try (Socket test = new Socket(address, 14001)) {
           return address;
         } catch (IOException e) {
-          System.out.println("Bad address given, using localhost");
+          System.out.println("Closing due to bad address given.");
         }
+      } else {
+        return "localhost";
       }
     } catch (IndexOutOfBoundsException e) {
-      System.out.println("No address given despite command, using localhost");
+      System.out.println("Closing due to no address given despite command.");
     }
 
-    return "localhost";
+    return "error";
   }
 
+  /**
+   * process argument to specify port
+   * @param args arguments passed in
+   * @return port specified, 14001 or -1 (error)
+   */
   public static int getPort(List<String> args) {
     try {
       if (args.contains("-csp")) {
         int i = args.indexOf("-csp");
         int port = Integer.parseInt(args.get(i + 1));
-        //TODO: check port
         return port;
+      } else {
+        return 14001;
       }
     } catch (IndexOutOfBoundsException e) {
-      System.out.println("No port given despite command, using 14001");
+      System.out.println("Closing due to no port given despite command.");
     } catch (NumberFormatException e) {
-      System.out.println("Bad port given, using 14001");
+      System.out.println("Closing due to bad port given.");
     }
 
-    return 14001;
+    return -1;
   }
 
+  /**
+   * 
+   * @param args arguments passed in
+   * @param address valid address to instantiate client
+   * @param port valid port to instantiate client
+   * @return
+   */
   public static Client getClient(List<String> args, String address, int port) {
 
-    if (args.contains("-botclient")) {
+    //create bot
+    if (args.contains("-bot")) {
       return new ChatBot(address, port);
     }
 
-    //TODO: -dodclient
+    //TODO:create a dod
 
-
+    //user is default
     return new ChatUser(address, port);
   }
 }

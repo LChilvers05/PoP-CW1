@@ -34,7 +34,7 @@ abstract class Client {
     try {
       socket.close();
       
-      println("Goodbye " + clientName);
+      println("Goodbye " + clientName + ".");
 
     } catch (IOException e) {
       e.printStackTrace();

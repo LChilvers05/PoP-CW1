@@ -2,7 +2,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-class ChatUser extends Client implements ConnectionDelegate {
+/**client operated by a user */
+class ChatUser extends Client implements Closer {
 
   BufferedReader userInput;
 
@@ -11,6 +12,7 @@ class ChatUser extends Client implements ConnectionDelegate {
     userInput = new BufferedReader(new InputStreamReader(System.in));
     println("> Enter chat name");
     try {
+      //name to make up clientID
       clientName = userInput.readLine();
       openSocket(address, port);
     } catch (IOException e) {
@@ -18,8 +20,11 @@ class ChatUser extends Client implements ConnectionDelegate {
     }
   }
   
+  /**
+   * close the console input reader
+   */
   @Override
-  public void disconnect() {
+  public void closeReaders() {
     try {
       userInput.close();
     } catch (IOException e) {
@@ -27,32 +32,34 @@ class ChatUser extends Client implements ConnectionDelegate {
     }
   }
 
+  /**
+   * 
+   */
   @Override
   public void connect() {
     super.connect();
     try {
       //start new server connection thread to read messages
       ServerConnection server = new ServerConnection(socket);
-      server.connectionDelegate = this;
+      //delegation pattern so connection thread talks to ChatUser
+      server.closer = this;
       Thread serverThread = new Thread(server);
       serverThread.start();
 
+      //repeatedly get messages from console
       while(true) {
         String userInputStr = userInput.readLine();
         if (userInputStr == null) {
           break;
         }
-        //send input to server
+        //send message
         serverOut.println(userInputStr);
       }
 
     } catch (IOException e) {
-      println("Disconnected from Server");
+      println("Disconnected.");
     } finally {
       closeSocket();
     }
   }
-
-  @Override
-  public void replyToMessage(String msg) {}
 }
