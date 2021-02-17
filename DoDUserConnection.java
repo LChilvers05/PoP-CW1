@@ -3,11 +3,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-/**listens to server in separate thread and outputs to user */
-public class ServerConnection extends Connection implements Runnable {
+public class DoDUserConnection extends BotConnection {
 
-  public ServerConnection (Socket serverSocket) {
-    super(serverSocket);
+  public DoDUserConnection (Socket serverSocket, String id) {
+    super(serverSocket, id);
   }
 
   @Override
@@ -16,28 +15,25 @@ public class ServerConnection extends Connection implements Runnable {
     closer.closeReaders();
   }
 
-  /**
-   * reads server input and outputs to console
-   */
   @Override
-  public void run() {
+  public void listen() {
     try {
-      //to read data from server
       serverIn = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 
       while(true) {
-        //response = clientID: message
+       
         String response = serverIn.readLine();
         //server shut down, disconnect client
-        if (response.equals("SERVER_SHUTDOWN")) {
-          ChatUser.println("Server Stopped.");
+        if (response.equals("SERVER_SHUTDOWN") || response.equals("WIN") || response.equals("LOSE")) {
+          println(response);
           break;
         }
-        String msg = formatMessage(response);
-        //output formatted message
-        ChatUser.println(msg);
+        println(response);
+        if (response.equals("> Type a command...")) {
+          replyDelegate.replyToMessage(response);
+        }
       }
-  
+
     } catch (IOException e) {
       e.printStackTrace();
 

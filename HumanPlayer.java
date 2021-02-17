@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 /**
@@ -5,6 +8,9 @@ import java.util.Arrays;
  *
  */
 public class HumanPlayer extends Player {
+
+    private BufferedReader userInput;
+    private PrintWriter output;
 
     /** The players score - gold collected with PICKUP */
     private int goldOwned = 0;
@@ -26,27 +32,31 @@ public class HumanPlayer extends Player {
      */
     @Override
     protected String getInput() {
-        //INVALID inputs count as a turn
         String command = "";
-        println("> Type a command...");
-        String input = GameLogic.userInput.nextLine().toUpperCase();
-        //valid command apart from MOVE
-        if (Arrays.asList(commands).contains(input)) {
-            command = input;
-        //separate MOVE command and check in format MOVE <N/S/E/W>
-        } else if (input.contains("MOVE")) {
-            try {
-                String[] moveCommand = input.split("\\s+");
-                if (moveCommand.length > 0) {
-                    String dir = moveCommand[1];
-                    if (dir.equals("N") || dir.equals("S") || dir.equals("E") || dir.equals("W")) {
-                        command = input;
+        try {
+            //INVALID inputs count as a turn
+            output.println("> Type a command...");
+            String input = userInput.readLine().toUpperCase();
+            //valid command apart from MOVE
+            if (Arrays.asList(commands).contains(input)) {
+                command = input;
+            //separate MOVE command and check in format MOVE <N/S/E/W>
+            } else if (input.contains("MOVE")) {
+                try {
+                    String[] moveCommand = input.split("\\s+");
+                    if (moveCommand.length > 0) {
+                        String dir = moveCommand[1];
+                        if (dir.equals("N") || dir.equals("S") || dir.equals("E") || dir.equals("W")) {
+                            command = input;
+                        }
                     }
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    command = "Invalid";
                 }
-            } catch (ArrayIndexOutOfBoundsException e) {
+            } else {
                 command = "Invalid";
             }
-        } else {
+        } catch (IOException e) {
             command = "Invalid";
         }
         return command;
@@ -58,5 +68,12 @@ public class HumanPlayer extends Player {
 
     public void setGoldOwned(int goldOwned) {
         this.goldOwned = goldOwned;
+    }
+
+    public void setUserInput(BufferedReader in) {
+        this.userInput = in;
+    }
+    public void setOutput(PrintWriter out) {
+        this.output = out;
     }
 }

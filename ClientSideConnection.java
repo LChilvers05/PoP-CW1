@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 /**inherited from to read from the server*/
-abstract class Connection {
+abstract class ClientSideConnection {
 
   Socket serverSocket;
 
@@ -13,8 +13,11 @@ abstract class Connection {
   /**to communicate with Client from Connection*/
   Closer closer;
 
-  public Connection (Socket serverSocket) {
+  String ID;
+
+  public ClientSideConnection (Socket serverSocket, String id) {
     this.serverSocket = serverSocket;
+    this.ID = id;
   }
 
   /**
@@ -22,8 +25,12 @@ abstract class Connection {
    * @param clientID uniqueID,name
    * @return name
    */
-  public static String getClientName(String clientID) {
-    return clientID.split(",")[1];
+  public static String getClientName(String clientID, String id) {
+    if (clientID.equals(id)) {
+      return "Me";
+    }
+    String[] splitID = clientID.split(",");
+    return splitID[1];
   }
 
   /**
@@ -31,9 +38,9 @@ abstract class Connection {
    * @param response raw input read from server
    * @return formatted message
    */
-  public String formatMessage(String response) {
+  public String formatMessage(String response, String id) {
     String[] splitResponse = response.split(";");
-    String name = getClientName(splitResponse[0]);
+    String name = getClientName(splitResponse[0], id);
     String msg = splitResponse[1];
     return name + ": " + msg;
   }
@@ -49,5 +56,9 @@ abstract class Connection {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public static void println(String msg) {
+    System.out.println(msg);
   }
 }

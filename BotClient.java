@@ -1,12 +1,14 @@
-/**bot that simply replies to messages */
-public class ChatBot extends Client implements ReplyDelegate {
+import java.util.UUID;
+
+/** bot that simply replies to messages */
+public class BotClient extends Client implements ReplyDelegate {
 
   /**for scripted reply to messages */
   MessageHandler msgHandler = new MessageHandler();
 
-  public ChatBot(String address, int port) {
+  public BotClient(String address, int port) {
     println("ChatBot activated");
-    clientName = "ChatBot";
+    ID = UUID.randomUUID().toString() + ",ChatBot";
     openSocket(address, port);
   }
 
@@ -26,8 +28,10 @@ public class ChatBot extends Client implements ReplyDelegate {
   @Override
   public void connect() {
     super.connect();
+    serverOut.println("CHAT");
+    serverOut.println(ID);
     //start new server connection (not a thread)
-    BotConnection bot = new BotConnection(socket);
+    BotConnection bot = new BotConnection(socket, ID);
     bot.replyDelegate = this;
     bot.listen();
   }

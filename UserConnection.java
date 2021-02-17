@@ -3,20 +3,26 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-/**listens to server and tells ChatBot to reply*/
-public class BotConnection extends ClientSideConnection {
+/**listens to server in separate thread and outputs to user */
+public class UserConnection extends ClientSideConnection implements Runnable {
 
-  ReplyDelegate replyDelegate;
-
-  public BotConnection (Socket serverSocket, String id) {
+  public UserConnection (Socket serverSocket, String id) {
     super(serverSocket, id);
   }
 
+  @Override
+  public void closeReaders() {
+    super.closeReaders();
+    closer.closeReaders();
+  }
+
   /**
-   * reads server input and informs ChatBot
+   * reads server input and outputs to console
    */
-  public void listen() {
+  @Override
+  public void run() {
     try {
+      //to read data from server
       serverIn = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 
       while(true) {
@@ -24,16 +30,14 @@ public class BotConnection extends ClientSideConnection {
         String response = serverIn.readLine();
         //server shut down, disconnect client
         if (response.equals("SERVER_SHUTDOWN")) {
+          UserClient.println("Server Stopped.");
           break;
         }
-        //bot doesn't reply to self
-        if (!response.split(";")[0].equals(ID)) {
-          String msg = formatMessage(response, ID);
-          //get ChatBot to reply to the message
-          replyDelegate.replyToMessage(msg);
-        }
+        String msg = formatMessage(response, ID);
+        //output formatted message
+        println(msg);
       }
-      
+  
     } catch (IOException e) {
       e.printStackTrace();
 

@@ -103,7 +103,6 @@ public class Map {
 										goldRequired = Integer.parseInt(mapFileRow.substring(4, mapFileRow.length()));
 										if (goldRequired < 0) {
 												goldRequired = 0;
-												GameLogic.println("No gold required, just escape!");
 										}
 								}
 
