@@ -1,6 +1,5 @@
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
@@ -9,8 +8,8 @@ class DoDConnection extends ServerSideConnection implements Runnable {
 
   GameLogic logic;
 
-  public DoDConnection(Socket clientSocket) {
-    super(clientSocket);
+  public DoDConnection(Socket clientSocket, BufferedReader clientIn) {
+    super(clientSocket, clientIn);
 
     //create game, map and player
     logic = new GameLogic();
@@ -29,7 +28,7 @@ class DoDConnection extends ServerSideConnection implements Runnable {
   public void run() {
     try {
       //to read data from the client
-      clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+      // clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       logic.p1.setUserInput(clientIn);
 
       //to send data to the client

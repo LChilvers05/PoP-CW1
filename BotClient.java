@@ -27,11 +27,10 @@ public class BotClient extends Client implements ReplyDelegate {
   public void connect() {
     super.connect();
     serverOut.println("CHAT");
+    serverOut.println(clientName);
     //start new server connection (not a thread)
     BotConnection bot = new BotConnection(socket);
     bot.replyDelegate = this;
     bot.listen();
-    
-    serverOut.println(clientName);
   }
 }

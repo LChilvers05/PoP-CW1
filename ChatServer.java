@@ -56,11 +56,11 @@ class ChatServer implements ClientsDelegate {
         //accept client connection
         Socket clientSocket = serverSocket.accept();
         println("Connection on: " + serverSocket.getLocalPort() + " ; " + clientSocket.getPort());
-        BufferedReader typeIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        String type = typeIn.readLine();
+        BufferedReader clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        String type = clientIn.readLine();
         if (type.equals("CHAT")) {
           //create and start new thread for this client
-          ChatConnection client = new ChatConnection(clientSocket, chatQueue);
+          ChatConnection client = new ChatConnection(clientSocket, clientIn, chatQueue);
           client.clientDelegate = this;
           Thread clientThread = new Thread(client);
           synchronized (chatClients) {
@@ -69,7 +69,7 @@ class ChatServer implements ClientsDelegate {
           clientThread.start();
         //"DOD"
         } else {
-          DoDConnection client = new DoDConnection(clientSocket);
+          DoDConnection client = new DoDConnection(clientSocket, clientIn);
           client.clientDelegate = this;
           Thread clientThread = new Thread(client);
           clientThread.start();

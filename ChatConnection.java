@@ -1,6 +1,5 @@
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -12,8 +11,8 @@ class ChatConnection extends ServerSideConnection implements Runnable {
    * for handling client connections on a separate thread
    * @param clientSocket
    */
-  public ChatConnection(Socket clientSocket, ChatQueue chatQueue) {
-    super(clientSocket);
+  public ChatConnection(Socket clientSocket, BufferedReader clientIn, ChatQueue chatQueue) {
+    super(clientSocket, clientIn);
     this.chatQueue = chatQueue;
   }
 
@@ -41,7 +40,7 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   public void run() {
     try {
       //to read data from the client
-      clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+      // clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
       //to send data to the client
       clientOut = new PrintWriter(clientSocket.getOutputStream(), true);

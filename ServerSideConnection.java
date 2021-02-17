@@ -16,8 +16,9 @@ public abstract class ServerSideConnection {
 
   protected boolean isConnected = true;
 
-  public ServerSideConnection(Socket clientSocket) {
+  public ServerSideConnection(Socket clientSocket, BufferedReader clientIn) {
     this.clientSocket = clientSocket;
+    this.clientIn = clientIn;
   }
 
   public void closeClientSocket() {
