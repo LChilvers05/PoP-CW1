@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 /**
@@ -9,6 +10,7 @@ import java.util.Arrays;
 public class HumanPlayer extends Player {
 
     private BufferedReader userInput;
+    private PrintWriter output;
 
     /** The players score - gold collected with PICKUP */
     private int goldOwned = 0;
@@ -33,8 +35,7 @@ public class HumanPlayer extends Player {
         String command = "";
         try {
             //INVALID inputs count as a turn
-            //TODO: send to client
-            println("> Type a command...");
+            output.println("> Type a command...");
             String input = userInput.readLine().toUpperCase();
             //valid command apart from MOVE
             if (Arrays.asList(commands).contains(input)) {
@@ -71,5 +72,8 @@ public class HumanPlayer extends Player {
 
     public void setUserInput(BufferedReader in) {
         this.userInput = in;
+    }
+    public void setOutput(PrintWriter out) {
+        this.output = out;
     }
 }

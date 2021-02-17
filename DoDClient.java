@@ -2,7 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-class DoDClient extends Client implements Closer {
+class DoDClient extends Client implements Closer, ReplyDelegate {
 
   BufferedReader userInput;
 
@@ -32,28 +32,29 @@ class DoDClient extends Client implements Closer {
   @Override
   public void connect() {
     super.connect();
-    try {
-      serverOut.println("DOD");
-      //start new user conncetion thread to read game events
-      UserConnection server = new UserConnection(socket);
-      //delegation patter so connection thread talks to DoDClient
-      server.closer = this;
-      Thread serverThread = new Thread(server);
-      serverThread.start();
+    serverOut.println("DOD");
+    //start new user connection to read game events
+    DoDUserConnection dod = new DoDUserConnection(socket);
+    //delegation patter so connection thread talks to DoDClient
+    dod.closer = this;
+    dod.replyDelegate = this;
+    dod.listen();
+  }
 
-      //repeatedly get messages from console
-      while(true) {
-        String userInputStr = userInput.readLine();
-        if (userInputStr == null) {
-          break;
-        }
-        //send game cmd
-        serverOut.println(userInputStr);
-      }
+  @Override
+  public void replyToMessage(String msg) {
+    try {
+      String cmd = userInput.readLine().toUpperCase();
+      serverOut.println(cmd);
+
     } catch (IOException e) {
-      println("Disconnected.");
-    } finally {
-      closeSocket();
-    }
+      e.printStackTrace();
+
+    } catch (NullPointerException e) {
+      println("NULL POINTER EXCEPTION");
+    } 
+    // finally {
+    //   closeSocket();
+    // }
   }
 }

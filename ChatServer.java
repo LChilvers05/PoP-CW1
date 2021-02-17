@@ -133,6 +133,7 @@ class ChatServer implements ClientsDelegate {
     chatQueue.dequeue();
   }
 
+  //TODO: DOD CLIENT NOT ADDED TO THIS LIST so not disconnected
   @Override
   public void disconnectClients() {
     synchronized(chatClients) {
