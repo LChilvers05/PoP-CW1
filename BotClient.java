@@ -7,7 +7,7 @@ public class BotClient extends Client implements ReplyDelegate {
   MessageHandler msgHandler = new MessageHandler();
 
   public BotClient(String address, int port) {
-    println("ChatBot activated");
+    println("ChatBot activated.");
     ID = UUID.randomUUID().toString() + ",ChatBot";
     openSocket(address, port);
   }

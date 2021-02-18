@@ -33,7 +33,7 @@ public abstract class ServerSideConnection {
     }
   }
 
-  abstract public void write(String sender);
+  abstract public void sendChatMessage(String sender);
 
   public void sendDisconnectRequest() {
     clientOut.println("SERVER_SHUTDOWN");

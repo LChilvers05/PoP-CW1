@@ -36,7 +36,7 @@ public class BotPlayer extends Player {
      * @return Bot's next String command.
      */
     @Override
-    protected String getInput() {
+    protected String getInput(String cmd) {
         //run out of stuff to do - update graph
         if (moveSet.isEmpty()) {
             moveSet.add("LOOK");
@@ -49,8 +49,8 @@ public class BotPlayer extends Player {
      * Processes the command. Returns a reply in form of a String.
      */
     @Override
-    protected String getNextAction() {
-        String command = getInput();
+    protected String getNextAction(String cmd) {
+        String command = getInput(cmd);
         //bot can only use LOOK and MOVE <N/S/E/W>
         switch(command) {
             case "LOOK":

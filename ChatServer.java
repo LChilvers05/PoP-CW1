@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,7 +14,8 @@ class ChatServer implements ClientsDelegate {
   private boolean running = false;
 
   private LinkedList<ChatConnection> chatClients = new LinkedList<>();
-  private LinkedList<DoDConnection> dodClients = new LinkedList<>();
+  private HashMap<String, ChatConnection> dodPlayers = new HashMap<>();
+  private ChatConnection dodClient;
   private ChatQueue chatQueue;
 
   public ChatServer(int port) {
@@ -59,25 +61,23 @@ class ChatServer implements ClientsDelegate {
         println("Connection on: " + serverSocket.getLocalPort() + " ; " + clientSocket.getPort());
         BufferedReader clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         String type = clientIn.readLine();
-        if (type.equals("CHAT")) {
-          //create and start new thread for this client
-          ChatConnection client = new ChatConnection(clientSocket, clientIn, chatQueue);
-          client.clientDelegate = this;
-          Thread clientThread = new Thread(client);
+
+        //create new client
+        ChatConnection client = new ChatConnection(clientSocket, clientIn, chatQueue);
+        client.clientDelegate = this;
+        if (type.equals("DOD")) {
+          client.setIsDoD(true);
+          dodClient = client;
+        } else {
+          client.setIsDoD(false);
           synchronized (chatClients) {
             chatClients.add(client);
           }
-          clientThread.start();
-        //"DOD"
-        } else {
-          DoDConnection client = new DoDConnection(clientSocket, clientIn);
-          client.clientDelegate = this;
-          Thread clientThread = new Thread(client);
-          synchronized(dodClients) {
-            dodClients.add(client);
-          }
-          clientThread.start();
         }
+
+        //new thread for this client
+        Thread clientThread = new Thread(client);
+        clientThread.start();
       }
 
     } catch (IOException e) {
@@ -111,7 +111,7 @@ class ChatServer implements ClientsDelegate {
   //MARK: ClientsDelegate methods
 
   @Override
-  public void forgetClient(String clientID) {
+  public void forgetChatClient(String clientID) {
     synchronized (chatClients) {
       ChatConnection foundClient = null;
       for (ChatConnection client : chatClients) {
@@ -131,7 +131,7 @@ class ChatServer implements ClientsDelegate {
     // for all client connections
     for (ChatConnection client : chatClients) {
       // write the latest message in chat
-      client.write(sender);
+      client.sendChatMessage(sender);
     }
     // done with message, release it
     chatQueue.dequeue();
@@ -145,11 +145,43 @@ class ChatServer implements ClientsDelegate {
         client.sendDisconnectRequest();
       }
     }
-    synchronized(dodClients) {
-      for (DoDConnection client : dodClients) {
+    synchronized(dodPlayers) {
+      for (ChatConnection client : dodPlayers.values()) {
         client.sendDisconnectRequest();
       }
     }
+  }
+
+  @Override
+  public void addChatClient(ChatConnection client) {
+    // request all clients to disconnect
+    synchronized(chatClients) {
+      chatClients.add(client);
+    }
+  }
+
+  @Override
+  public void addDoDPlayer(ChatConnection client) {
+    synchronized(dodPlayers) {
+      dodPlayers.put(client.getClientID(), client);
+    }
+  }
+
+  @Override
+  public void forgetDoDPlayer(String clientID) {
+    synchronized(dodPlayers) {
+      dodPlayers.remove(clientID);
+    }
+  }
+
+  @Override
+  public void sendToClient(String sender, String reciever, String msg) {
+    dodPlayers.get(reciever).sendDoDResponse(sender, msg);
+  }
+
+  @Override
+  public void sendToDoDClient(String sender, String msg) {
+    dodClient.sendDoDCommand(sender, msg);
   }
 
   //helper functions

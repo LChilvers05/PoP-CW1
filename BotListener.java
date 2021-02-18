@@ -21,7 +21,7 @@ public class BotListener extends ClientSideConnection {
       serverIn = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 
       while(true) {
-        //response = clientID: message
+        //response = clientID; message
         String response = serverIn.readLine();
         //server shut down, disconnect client
         if (response.equals("SERVER_SHUTDOWN")) {

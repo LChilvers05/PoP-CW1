@@ -7,6 +7,9 @@ class ChatConnection extends ServerSideConnection implements Runnable {
 
   ChatQueue chatQueue;
 
+  private Boolean isDoDClient;
+  private Boolean isPlayingDoD = false;
+
   /**
    * for handling client connections on a separate thread
    * @param clientSocket
@@ -22,14 +25,26 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   @Override
   public void closeClientSocket() {
     super.closeClientSocket();
-    clientDelegate.forgetClient(clientID);
+    clientDelegate.forgetChatClient(clientID);
   }
 
   //format the message
   @Override
-  public void write(String sender) {
+  public void sendChatMessage(String sender) {
     String msg = sender + ";" + chatQueue.next();
-    // send to client
+    //send to client
+    clientOut.println(msg);
+  }
+
+  public void sendDoDResponse(String sender, String response) {
+    String msg = sender + ";" + response;
+    //send to player
+    clientOut.println(msg);
+  }
+
+  public void sendDoDCommand(String sender, String command) {
+    String msg = sender + ";" + command;
+    // send to DoDClient
     clientOut.println(msg);
   }
 
@@ -50,11 +65,14 @@ class ChatConnection extends ServerSideConnection implements Runnable {
         if (msg == null) {
           break;
         }
-        synchronized(chatQueue) {
-          //add to chat queue
-          chatQueue.enqueue(msg);
-          //request server to send to all clients
-          clientDelegate.sendToAllClients(clientID);
+        if (isDoDClient) {
+          handleGameDoD(msg);
+        } else {
+          if (isPlayingDoD) {
+            handleGamePlayer(msg);
+          } else {
+            handleChat(msg);
+          }
         }
       }
 
@@ -63,5 +81,49 @@ class ChatConnection extends ServerSideConnection implements Runnable {
     } finally {
       closeClientSocket();
     }
+  }
+
+  private void handleChat(String msg) {
+    //requesting to start DoD game
+    if (msg.toUpperCase().equals("JOIN")) {
+      isPlayingDoD = true;
+      //transfer client from chat to dod
+      clientDelegate.forgetChatClient(clientID);
+      clientDelegate.addDoDPlayer(this);
+      //tell DoDClient to create a new game
+      handleGamePlayer(msg);
+    //inteded for chat room
+    } else {
+      synchronized(chatQueue) {
+        //add to chat queue
+        chatQueue.enqueue(msg);
+        //request server to send to all clients
+        clientDelegate.sendToAllClients(clientID);
+      }
+    }
+  }
+
+  private void handleGameDoD(String msg) {
+    String player = getPlayerID(msg);
+    String result = getMessage(msg);
+    clientDelegate.sendToClient(clientID, player, result);
+  }
+
+  private void handleGamePlayer(String cmd) {
+    clientDelegate.sendToDoDClient(clientID, cmd);
+  }
+
+  private String getPlayerID(String response) {
+    String[] splitResponse = response.split(";");
+    return splitResponse[0];
+  }
+
+  private String getMessage(String response) {
+    String[] splitResponse = response.split(";");
+    return splitResponse[1].toUpperCase();
+  }
+
+  public void setIsDoD(Boolean is) {
+    isDoDClient = is;
   }
 }
