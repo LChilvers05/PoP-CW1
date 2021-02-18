@@ -4,11 +4,11 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 /**listens to server and tells ChatBot to reply*/
-public class BotConnection extends ClientSideConnection {
-
+public class BotListener extends ClientSideConnection {
+  
   ReplyDelegate replyDelegate;
 
-  public BotConnection (Socket serverSocket, String id) {
+  public BotListener (Socket serverSocket, String id) {
     super(serverSocket, id);
   }
 
@@ -17,6 +17,7 @@ public class BotConnection extends ClientSideConnection {
    */
   public void listen() {
     try {
+      //to read from server
       serverIn = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 
       while(true) {
@@ -26,7 +27,7 @@ public class BotConnection extends ClientSideConnection {
         if (response.equals("SERVER_SHUTDOWN")) {
           break;
         }
-        //bot doesn't reply to self
+        //so bot doesn't reply to self
         if (!response.split(";")[0].equals(ID)) {
           String msg = formatMessage(response, ID);
           //get ChatBot to reply to the message
