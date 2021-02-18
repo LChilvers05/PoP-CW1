@@ -58,18 +58,19 @@ class ArgHandler {
    * @param args arguments passed in
    * @param address valid address to instantiate client
    * @param port valid port to instantiate client
-   * @return
+   * @return Client object specified
    */
   public static Client getClient(List<String> args, String address, int port) {
 
-    //create bot
+    //create bot client
     if (args.contains("-bot")) {
       return new BotClient(address, port);
 
+    //create dod client
     } else if (args.contains("-dod")) {
       return new DoDClient(address, port);
     }
-    //user is default
+    //default user client
     return new UserClient(address, port);
   }
 }
