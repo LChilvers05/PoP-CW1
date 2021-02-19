@@ -10,6 +10,8 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   private Boolean isDoDClient;
   private Boolean isPlayingDoD = false;
 
+  private final String EOT = "EOT";
+
   /**
    * for handling client connections on a separate thread
    * @param clientSocket
@@ -60,16 +62,29 @@ class ChatConnection extends ServerSideConnection implements Runnable {
       setClientID(clientIn.readLine());
 
       while(isConnected) {
-        //read from client
-        String msg = clientIn.readLine();
-        if (msg == null) {
-          break;
-        }
+
         if (isDoDClient) {
-          handleGameDoD(msg);
+
+          StringBuilder msg = new StringBuilder();
+          while(true) {
+            String line = clientIn.readLine();
+            msg.append(line + "_");
+            if (line.contains(EOT)) {
+              break;
+            }
+          }
+          handleGameDoD(msg.toString().split(EOT)[0]);
+
         } else {
+          //read from client
+          String msg = clientIn.readLine();
+          if (msg == null) {
+            break;
+          }
+
           if (isPlayingDoD) {
             handleGamePlayer(msg);
+
           } else {
             handleChat(msg);
           }

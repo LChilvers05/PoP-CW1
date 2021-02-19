@@ -28,6 +28,7 @@ public class UserConnection extends ClientSideConnection implements Runnable {
       while(true) {
         //response = clientID: message
         String response = serverIn.readLine();
+        response = response.replaceAll("_", "\n");
         //server shut down, disconnect client
         if (response.equals("SERVER_SHUTDOWN")) {
           UserClient.println("Server Stopped.");

@@ -6,6 +6,8 @@ class DoDClient extends Client implements ReplyDelegate {
 
   private HashMap<String, GameLogic> games = new HashMap<>();
 
+  private final String EOT = "EOT";
+
   public DoDClient(String address, int port) {
     println("Dungeon of Doom activated.");
     ID = UUID.randomUUID().toString() + ",DODClient";
@@ -33,7 +35,7 @@ class DoDClient extends Client implements ReplyDelegate {
     //start a new game for playerID
     if (cmd.equals("JOIN")) {
       games.put(playerID, newGame());
-      serverOut.println(playerID + ";> Spawned");
+      serverOut.println(playerID + ";> Spawned" + EOT);
 
     //playerID has a game started
     } else {
@@ -46,7 +48,7 @@ class DoDClient extends Client implements ReplyDelegate {
           //println(game.checkMap()); //for debug
           //bot caught human
           if (Arrays.equals(game.p1.position, game.p2.position)) {
-            serverOut.println(playerID + ";LOSE");
+            serverOut.println(playerID + ";LOSE" + EOT);
             game.gameRunning = false;
             games.remove(playerID);
             break;
@@ -57,16 +59,16 @@ class DoDClient extends Client implements ReplyDelegate {
             game.nextPlayer = (game.nextPlayer == game.p2) ? game.p1 : game.p2;
 
             //request server to inform player of command result
-            String result = playerID + ";" + game.currentPlayer.getNextAction(cmd);
+            String result = playerID + ";\n" + game.currentPlayer.getNextAction(cmd);
             if (game.currentPlayer == game.p1) {
-              serverOut.println(result);
+              serverOut.println(result + EOT);
             }
           }
           i++;
         }
 
       } else {
-        serverOut.println(playerID + ";Start a game with JOIN");
+        serverOut.println(playerID + ";Start a game with JOIN" + EOT);
       }
     }
   }
