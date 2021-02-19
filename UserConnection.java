@@ -6,6 +6,8 @@ import java.net.Socket;
 /**listens to server in separate thread and outputs to user */
 public class UserConnection extends ClientSideConnection implements Runnable {
 
+  private final String NL = "NL";
+
   public UserConnection (Socket serverSocket, String id) {
     super(serverSocket, id);
   }
@@ -28,7 +30,7 @@ public class UserConnection extends ClientSideConnection implements Runnable {
       while(true) {
         //response = clientID: message
         String response = serverIn.readLine();
-        response = response.replaceAll("NL", "\n");
+        response = response.replaceAll(NL, "\n");
         //server shut down, disconnect client
         if (response.equals("SERVER_SHUTDOWN")) {
           UserClient.println("Server Stopped.");

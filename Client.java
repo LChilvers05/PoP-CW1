@@ -23,7 +23,7 @@ abstract class Client {
     } catch (UnknownHostException e) {
       println("This is not a know server host, closing program.");
     } catch (IOException e) {
-      println("Something went wrong, closing program.");
+      println("Could not connect to server, closing program.");
     }
   }
 
@@ -43,7 +43,6 @@ abstract class Client {
 
   public void connect() {
     try {
-      //to send data to server
       serverOut = new PrintWriter(socket.getOutputStream(), true);
     } catch (IOException e) {
       e.printStackTrace();

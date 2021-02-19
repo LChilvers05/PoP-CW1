@@ -17,15 +17,18 @@ class DoDClient extends Client implements ReplyDelegate {
 
   @Override
   public void connect() {
-    super.connect();
-    serverOut.println("DOD");
-    //give the client connection a unique identifier
-    serverOut.println(ID);
-    //start new user connection to read game events
-    DoDListener dod = new DoDListener(socket, ID);
-    //delegation patter so connection thread talks to DoDClient
-    dod.replyDelegate = this;
-    dod.listen();
+    if (socket != null) {
+      super.connect();
+
+      serverOut.println("DOD");
+      //give the client connection a unique identifier
+      serverOut.println(ID);
+      //start new user connection to read game events
+      DoDListener dod = new DoDListener(socket, ID);
+      //delegation patter so connection thread talks to DoDClient
+      dod.replyDelegate = this;
+      dod.listen();
+    }
   }
 
   @Override

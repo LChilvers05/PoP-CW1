@@ -27,14 +27,16 @@ public class BotClient extends Client implements ReplyDelegate {
 
   @Override
   public void connect() {
-    super.connect();
-    //inform what type of connection
-    serverOut.println("CHAT");
-    //give the client connection a unique identifier
-    serverOut.println(ID);
-    //start new server connection (not a thread)
-    BotListener bot = new BotListener(socket, ID);
-    bot.replyDelegate = this;
-    bot.listen();
+    if (socket != null) {
+      super.connect();
+      //inform what type of connection
+      serverOut.println("CHAT");
+      //give the client connection a unique identifier
+      serverOut.println(ID);
+      //start new server connection (not a thread)
+      BotListener bot = new BotListener(socket, ID);
+      bot.replyDelegate = this;
+      bot.listen();
+    }
   }
 }
