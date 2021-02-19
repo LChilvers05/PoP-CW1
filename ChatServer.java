@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
@@ -59,28 +60,8 @@ class ChatServer implements ClientsDelegate {
         Socket clientSocket = serverSocket.accept();
         println("Connection on: " + serverSocket.getLocalPort() + " ; " + clientSocket.getPort());
         BufferedReader clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        String type = clientIn.readLine();
-
-        //create new client
-        ChatConnection client = new ChatConnection(clientSocket, clientIn, chatQueue);
-        client.clientDelegate = this;
-
-        //check for DoD Client
-        if (type.equals("DOD")) {
-          if (dodClient == null) {
-            client.setIsDoD(true);
-            dodClient = client;
-          } else {
-            //already have DoDClient, reject connection
-            client.sendDisconnectRequest();
-          }
-        } else {
-          client.setIsDoD(false);
-        }
-
-        //new thread for this client
-        Thread clientThread = new Thread(client);
-        clientThread.start();
+        PrintWriter clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
+        createClient(clientSocket, clientIn, clientOut, clientIn.readLine());
       }
 
     } catch (IOException e) {
@@ -112,6 +93,29 @@ class ChatServer implements ClientsDelegate {
       }
     };
     stopperThread.start();
+  }
+
+  private void createClient(Socket clientSocket, BufferedReader clientIn, PrintWriter clientOut, String type) {
+    //create new client
+    ChatConnection client = new ChatConnection(clientSocket, clientIn, clientOut, chatQueue);
+    client.clientDelegate = this;
+
+    Boolean multipleDoDFlag = false;
+    //check for DoD Client
+    if (type.equals("DOD")) {
+      if (dodClient == null) {
+        client.setIsDoD(true);
+        dodClient = client;
+      } else {
+        multipleDoDFlag = true;
+      }
+    }
+
+    //new thread for this client
+    Thread clientThread = new Thread(client);
+    clientThread.start();
+
+    if (multipleDoDFlag) { client.sendDisconnectRequest(); }
   }
 
   //ClientsDelegate methods:

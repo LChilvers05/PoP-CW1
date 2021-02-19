@@ -51,7 +51,7 @@ class DoDClient extends Client implements ReplyDelegate {
           //println(game.checkMap()); //for debug
           //bot caught human
           if (Arrays.equals(game.p1.position, game.p2.position)) {
-            serverOut.println(playerID + ";LOSE" + EOT);
+            serverOut.println(playerID + ";\nLOSE" + EOT);
             game.gameRunning = false;
             games.remove(playerID);
             break;

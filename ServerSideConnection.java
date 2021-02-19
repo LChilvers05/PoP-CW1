@@ -16,9 +16,10 @@ public abstract class ServerSideConnection {
 
   protected boolean isConnected = true;
 
-  public ServerSideConnection(Socket clientSocket, BufferedReader clientIn) {
+  public ServerSideConnection(Socket clientSocket, BufferedReader clientIn, PrintWriter clientOut) {
     this.clientSocket = clientSocket;
     this.clientIn = clientIn;
+    this.clientOut = clientOut;
   }
 
   public void closeClientSocket() {
@@ -37,6 +38,8 @@ public abstract class ServerSideConnection {
 
   public void sendDisconnectRequest() {
     clientOut.println("SERVER_SHUTDOWN");
+    //TODO: Causes problem when disconnecting all because iterating on changing data struct
+    clientDelegate.forgetClient(clientID);
   }
 
   public String getClientID() {

@@ -7,7 +7,7 @@ class ChatConnection extends ServerSideConnection implements Runnable {
 
   ChatQueue chatQueue;
 
-  private Boolean isDoDClient;
+  private Boolean isDoDClient = false;
   private Boolean isPlayingDoD = false;
 
   private final String EOT = "EOT";
@@ -17,8 +17,8 @@ class ChatConnection extends ServerSideConnection implements Runnable {
    * for handling client connections on a separate thread
    * @param clientSocket
    */
-  public ChatConnection(Socket clientSocket, BufferedReader clientIn, ChatQueue chatQueue) {
-    super(clientSocket, clientIn);
+  public ChatConnection(Socket clientSocket, BufferedReader clientIn, PrintWriter clientOut, ChatQueue chatQueue) {
+    super(clientSocket, clientIn, clientOut);
     this.chatQueue = chatQueue;
   }
 
@@ -29,6 +29,9 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   public void closeClientSocket() {
     super.closeClientSocket();
     clientDelegate.forgetClient(clientID);
+    if (isDoDClient) {
+      //TODO: set to null in chat server
+    }
   }
 
   /**
@@ -55,8 +58,6 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   @Override
   public void run() {
     try {
-      //to send data to the client
-      clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
       //set the clientID for this client connection
       setClientID(clientIn.readLine());
       //tell ChatServer to remember this client
@@ -135,6 +136,7 @@ class ChatConnection extends ServerSideConnection implements Runnable {
     clientDelegate.sendToClient(clientID, player, result);
     //need to swap player back to chatter
     if (result.contains("LOSE") || result.contains("WIN")) {
+      System.out.println("REACHED");
       clientDelegate.swapChatPlayer(player);
     }
   }
