@@ -156,13 +156,22 @@ class ChatServer implements ClientsDelegate {
   public void addChatClient(ChatConnection client) {
     // request all clients to disconnect
     synchronized(chatClients) {
+      System.out.println(client.getIsPlayingDoD());
+      client.setIsPlayingDoD(false);
+      System.out.println(client.getIsPlayingDoD());
       chatClients.add(client);
     }
   }
 
   @Override
+  public void addChatClientWithID(String clientID) {
+    addChatClient(getClientForID(clientID));
+  }
+
+  @Override
   public void addDoDPlayer(ChatConnection client) {
     synchronized(dodPlayers) {
+      client.setIsPlayingDoD(true);
       dodPlayers.put(client.getClientID(), client);
     }
   }
@@ -182,6 +191,15 @@ class ChatServer implements ClientsDelegate {
   @Override
   public void sendToDoDClient(String sender, String msg) {
     dodClient.sendDoDCommand(sender, msg);
+  }
+
+  private ChatConnection getClientForID(String clientID) {
+    for (ChatConnection client : chatClients) {
+      if (client.getClientID().equals(clientID)) {
+        return client;
+      }
+    }
+    return dodPlayers.get(clientID); //null if in neither
   }
 
   //helper functions

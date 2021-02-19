@@ -11,6 +11,7 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   private Boolean isPlayingDoD = false;
 
   private final String EOT = "EOT";
+  private final String NL = "_";
 
   /**
    * for handling client connections on a separate thread
@@ -28,6 +29,7 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   public void closeClientSocket() {
     super.closeClientSocket();
     clientDelegate.forgetChatClient(clientID);
+    clientDelegate.forgetDoDPlayer(clientID);
   }
 
   //format the message
@@ -68,7 +70,7 @@ class ChatConnection extends ServerSideConnection implements Runnable {
           StringBuilder msg = new StringBuilder();
           while(true) {
             String line = clientIn.readLine();
-            msg.append(line + "_");
+            msg.append(line + NL);
             if (line.contains(EOT)) {
               break;
             }
@@ -101,7 +103,6 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   private void handleChat(String msg) {
     //requesting to start DoD game
     if (msg.toUpperCase().equals("JOIN")) {
-      isPlayingDoD = true;
       //transfer client from chat to dod
       clientDelegate.forgetChatClient(clientID);
       clientDelegate.addDoDPlayer(this);
@@ -122,6 +123,10 @@ class ChatConnection extends ServerSideConnection implements Runnable {
     String player = getPlayerID(msg);
     String result = getMessage(msg);
     clientDelegate.sendToClient(clientID, player, result);
+    if (result.contains("LOSE") || result.contains("WIN")) {
+      clientDelegate.addChatClientWithID(player);
+      clientDelegate.forgetDoDPlayer(player);
+    }
   }
 
   private void handleGamePlayer(String cmd) {
@@ -140,5 +145,11 @@ class ChatConnection extends ServerSideConnection implements Runnable {
 
   public void setIsDoD(Boolean is) {
     isDoDClient = is;
+  }
+  public void setIsPlayingDoD(Boolean is) {
+    isPlayingDoD = is;
+  }
+  public Boolean getIsPlayingDoD() {
+    return isPlayingDoD;
   }
 }

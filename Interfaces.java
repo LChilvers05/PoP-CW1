@@ -1,5 +1,6 @@
 interface ClientsDelegate {
   public void addChatClient(ChatConnection client);
+  public void addChatClientWithID(String clientID);
   public void addDoDPlayer(ChatConnection client);
 
   public void forgetChatClient(String clientID);
