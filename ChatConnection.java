@@ -11,7 +11,7 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   private Boolean isPlayingDoD = false;
 
   private final String EOT = "EOT";
-  private final String NL = "_";
+  private final String NL = "NL";
 
   /**
    * for handling client connections on a separate thread
@@ -68,12 +68,19 @@ class ChatConnection extends ServerSideConnection implements Runnable {
         if (isDoDClient) {
 
           StringBuilder msg = new StringBuilder();
+          String line;
           while(true) {
-            String line = clientIn.readLine();
+            line = clientIn.readLine();
+            if (line == null) {
+              break;
+            }
             msg.append(line + NL);
             if (line.contains(EOT)) {
               break;
             }
+          }
+          if (line == null) {
+            break;
           }
           handleGameDoD(msg.toString().split(EOT)[0]);
 
@@ -140,7 +147,7 @@ class ChatConnection extends ServerSideConnection implements Runnable {
 
   private String getMessage(String response) {
     String[] splitResponse = response.split(";");
-    return splitResponse[1].toUpperCase();
+    return splitResponse[1];
   }
 
   public void setIsDoD(Boolean is) {

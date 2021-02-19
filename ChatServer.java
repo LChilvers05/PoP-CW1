@@ -150,6 +150,9 @@ class ChatServer implements ClientsDelegate {
         client.sendDisconnectRequest();
       }
     }
+    if (dodClient != null) {
+      dodClient.sendDisconnectRequest();
+    }
   }
 
   @Override
