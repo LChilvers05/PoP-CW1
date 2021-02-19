@@ -28,11 +28,12 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   @Override
   public void closeClientSocket() {
     super.closeClientSocket();
-    clientDelegate.forgetChatClient(clientID);
-    clientDelegate.forgetDoDPlayer(clientID);
+    clientDelegate.forgetClient(clientID);
   }
 
-  //format the message
+  /**
+   * format the chat message before sending to chat
+   */
   @Override
   public void sendChatMessage(String sender) {
     String msg = sender + ";" + chatQueue.next();
@@ -40,33 +41,33 @@ class ChatConnection extends ServerSideConnection implements Runnable {
     clientOut.println(msg);
   }
 
-  public void sendDoDResponse(String sender, String response) {
-    String msg = sender + ";" + response;
-    //send to player
-    clientOut.println(msg);
-  }
-
-  public void sendDoDCommand(String sender, String command) {
-    String msg = sender + ";" + command;
-    // send to DoDClient
+  /**
+   * format the DoD message before sending to game
+   * @param sender a player or DoDClient
+   * @param str player command or DoDClient response
+   */
+  public void sendDoDMessage(String sender, String str) {
+    String msg = sender + ";" + str;
+    //send to player or DoDClient
     clientOut.println(msg);
   }
 
   @Override
   public void run() {
     try {
-      //to read data from the client
-      // clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
       //to send data to the client
       clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
-
+      //set the clientID for this client connection
       setClientID(clientIn.readLine());
+      //tell ChatServer to remember this client
+      if (!isDoDClient) {
+        clientDelegate.addClient(clientID, this);
+      }
 
       while(isConnected) {
 
         if (isDoDClient) {
-
+          //need string builder because DoD map is not on one line
           StringBuilder msg = new StringBuilder();
           String line;
           while(true) {
@@ -74,16 +75,19 @@ class ChatConnection extends ServerSideConnection implements Runnable {
             if (line == null) {
               break;
             }
+            //NL is replaced with \n on client side
             msg.append(line + NL);
             if (line.contains(EOT)) {
               break;
             }
           }
+          //disconnected
           if (line == null) {
             break;
           }
           handleGameDoD(msg.toString().split(EOT)[0]);
 
+        //chatter or player
         } else {
           //read from client
           String msg = clientIn.readLine();
@@ -93,7 +97,8 @@ class ChatConnection extends ServerSideConnection implements Runnable {
 
           if (isPlayingDoD) {
             handleGamePlayer(msg);
-
+          
+          //chatter
           } else {
             handleChat(msg);
           }
@@ -109,10 +114,8 @@ class ChatConnection extends ServerSideConnection implements Runnable {
 
   private void handleChat(String msg) {
     //requesting to start DoD game
-    if (msg.toUpperCase().equals("JOIN")) {
-      //transfer client from chat to dod
-      clientDelegate.forgetChatClient(clientID);
-      clientDelegate.addDoDPlayer(this);
+    if (msg.toUpperCase().equals("JOIN")) { //TODO: CHECK THERE IS A DOD CLIENT
+      isPlayingDoD = true;
       //tell DoDClient to create a new game
       handleGamePlayer(msg);
     //inteded for chat room
@@ -130,26 +133,25 @@ class ChatConnection extends ServerSideConnection implements Runnable {
     String player = getPlayerID(msg);
     String result = getMessage(msg);
     clientDelegate.sendToClient(clientID, player, result);
+    //need to swap player back to chatter
     if (result.contains("LOSE") || result.contains("WIN")) {
-      clientDelegate.addChatClientWithID(player);
-      clientDelegate.forgetDoDPlayer(player);
+      clientDelegate.swapChatPlayer(player);
     }
   }
 
   private void handleGamePlayer(String cmd) {
-    clientDelegate.sendToDoDClient(clientID, cmd);
+    //send command to the DoDClient
+    clientDelegate.sendToClient(clientID, "DoDClient", cmd);
   }
 
   private String getPlayerID(String response) {
     String[] splitResponse = response.split(";");
     return splitResponse[0];
   }
-
   private String getMessage(String response) {
     String[] splitResponse = response.split(";");
     return splitResponse[1];
   }
-
   public void setIsDoD(Boolean is) {
     isDoDClient = is;
   }

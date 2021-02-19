@@ -1,14 +1,11 @@
 interface ClientsDelegate {
-  public void addChatClient(ChatConnection client);
-  public void addChatClientWithID(String clientID);
-  public void addDoDPlayer(ChatConnection client);
-
-  public void forgetChatClient(String clientID);
-  public void forgetDoDPlayer(String clientID);
+  public void addClient(String clientID, ChatConnection client);
+  public void forgetClient(String clientID);
   
   public void sendToAllClients(String sender);
   public void sendToClient(String sender, String reciever, String msg);
-  public void sendToDoDClient(String sender, String msg);
+
+  public void swapChatPlayer(String clientID);
 
   public void disconnectClients();
 }

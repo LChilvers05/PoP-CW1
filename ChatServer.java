@@ -13,8 +13,7 @@ class ChatServer implements ClientsDelegate {
   private ServerSocket serverSocket;
   private boolean running = false;
 
-  private LinkedList<ChatConnection> chatClients = new LinkedList<>();
-  private HashMap<String, ChatConnection> dodPlayers = new HashMap<>();
+  private HashMap<String, ChatConnection> clients = new HashMap<>();
   private ChatConnection dodClient;
   private ChatQueue chatQueue;
 
@@ -56,7 +55,7 @@ class ChatServer implements ClientsDelegate {
     try {
       //continuously get client connections
       while(running) {
-        //accept client connection
+        //accept client connection of type
         Socket clientSocket = serverSocket.accept();
         println("Connection on: " + serverSocket.getLocalPort() + " ; " + clientSocket.getPort());
         BufferedReader clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -65,14 +64,18 @@ class ChatServer implements ClientsDelegate {
         //create new client
         ChatConnection client = new ChatConnection(clientSocket, clientIn, chatQueue);
         client.clientDelegate = this;
+
+        //check for DoD Client
         if (type.equals("DOD")) {
-          client.setIsDoD(true);
-          dodClient = client;
+          if (dodClient == null) {
+            client.setIsDoD(true);
+            dodClient = client;
+          } else {
+            //already have DoDClient, reject connection
+            client.sendDisconnectRequest();
+          }
         } else {
           client.setIsDoD(false);
-          synchronized (chatClients) {
-            chatClients.add(client);
-          }
         }
 
         //new thread for this client
@@ -87,7 +90,9 @@ class ChatServer implements ClientsDelegate {
     }
   }
   
-  //input to console to stop server with anonymous
+  /** 
+   * start thread to read console input
+   */
   public void startConsoleListener() {
     Thread stopperThread = new Thread() {
       public void run() {
@@ -95,6 +100,7 @@ class ChatServer implements ClientsDelegate {
           while(true) {
             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
             String cmd = userInput.readLine();
+            //only check for 'EXIT' to stop server and then diconnect clients
             if (cmd.toUpperCase().equals("EXIT")) {
               stopServer();
               break;
@@ -108,101 +114,69 @@ class ChatServer implements ClientsDelegate {
     stopperThread.start();
   }
 
-  //MARK: ClientsDelegate methods
+  //ClientsDelegate methods:
 
   @Override
-  public void forgetChatClient(String clientID) {
-    synchronized (chatClients) {
-      ChatConnection foundClient = null;
-      for (ChatConnection client : chatClients) {
-        if (client.getClientID().equals(clientID)) {
-          foundClient = client;
-          break;
-        }
-      }
-      if (foundClient != null) {
-        chatClients.remove(foundClient);
-      }
+  public void addClient(String clientID, ChatConnection client) {
+    //remember client
+    synchronized(clients) {
+      clients.put(clientID, client);
     }
   }
 
   @Override
-  public void sendToAllClients(String sender) {
-    // for all client connections
-    for (ChatConnection client : chatClients) {
-      // write the latest message in chat
-      client.sendChatMessage(sender);
+  public void forgetClient(String clientID) {
+    //remove client
+    synchronized(clients) {
+      clients.remove(clientID);
     }
-    // done with message, release it
+  }
+
+
+  @Override
+  public void sendToAllClients(String sender) {
+    //for all client connections
+    for (ChatConnection client : clients.values()) {
+      // if not playing dod
+      if (!client.getIsPlayingDoD()) {
+        client.sendChatMessage(sender);
+      }
+    }
+    //done with message, release it
     chatQueue.dequeue();
+  }
+
+  @Override
+  public void sendToClient(String sender, String reciever, String msg) {
+    //only used within a DoD game
+    if (reciever.equals("DoDClient")) {
+      //if message is from a player send to the DoDClient
+      dodClient.sendDoDMessage(sender, msg);
+    
+    } else {
+      //otherwise from DoDClient send to the player
+      clients.get(reciever).sendDoDMessage(sender, msg);
+    }
+  }
+
+  @Override
+  public void swapChatPlayer(String clientID) {
+    ChatConnection client = clients.get(clientID);
+    //swap player <--> chatter
+    client.setIsPlayingDoD(!client.getIsPlayingDoD());
   }
 
   @Override
   public void disconnectClients() {
     // request all clients to disconnect
-    synchronized(chatClients) {
-      for (ChatConnection client : chatClients) {
-        client.sendDisconnectRequest();
-      }
-    }
-    synchronized(dodPlayers) {
-      for (ChatConnection client : dodPlayers.values()) {
+    synchronized(clients) {
+      for (ChatConnection client : clients.values()) {
         client.sendDisconnectRequest();
       }
     }
     if (dodClient != null) {
       dodClient.sendDisconnectRequest();
     }
-  }
-
-  @Override
-  public void addChatClient(ChatConnection client) {
-    // request all clients to disconnect
-    synchronized(chatClients) {
-      System.out.println(client.getIsPlayingDoD());
-      client.setIsPlayingDoD(false);
-      System.out.println(client.getIsPlayingDoD());
-      chatClients.add(client);
-    }
-  }
-
-  @Override
-  public void addChatClientWithID(String clientID) {
-    addChatClient(getClientForID(clientID));
-  }
-
-  @Override
-  public void addDoDPlayer(ChatConnection client) {
-    synchronized(dodPlayers) {
-      client.setIsPlayingDoD(true);
-      dodPlayers.put(client.getClientID(), client);
-    }
-  }
-
-  @Override
-  public void forgetDoDPlayer(String clientID) {
-    synchronized(dodPlayers) {
-      dodPlayers.remove(clientID);
-    }
-  }
-
-  @Override
-  public void sendToClient(String sender, String reciever, String msg) {
-    dodPlayers.get(reciever).sendDoDResponse(sender, msg);
-  }
-
-  @Override
-  public void sendToDoDClient(String sender, String msg) {
-    dodClient.sendDoDCommand(sender, msg);
-  }
-
-  private ChatConnection getClientForID(String clientID) {
-    for (ChatConnection client : chatClients) {
-      if (client.getClientID().equals(clientID)) {
-        return client;
-      }
-    }
-    return dodPlayers.get(clientID); //null if in neither
   }
 
   //helper functions

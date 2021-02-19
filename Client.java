@@ -21,9 +21,9 @@ abstract class Client {
       socket = new Socket(address, port);
 
     } catch (UnknownHostException e) {
-      e.printStackTrace();
+      println("This is not a know server host, closing program.");
     } catch (IOException e) {
-      e.printStackTrace();
+      println("Something went wrong, closing program.");
     }
   }
 
