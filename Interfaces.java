@@ -7,6 +7,8 @@ interface ClientsDelegate {
 
   public void swapChatPlayer(String clientID);
 
+  public Boolean dodClientExists();
+
   public void disconnectClients();
 }
 

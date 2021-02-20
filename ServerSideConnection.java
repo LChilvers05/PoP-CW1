@@ -38,8 +38,6 @@ public abstract class ServerSideConnection {
 
   public void sendDisconnectRequest() {
     clientOut.println("SERVER_SHUTDOWN");
-    //TODO: Causes problem when disconnecting all because iterating on changing data struct
-    clientDelegate.forgetClient(clientID);
   }
 
   public String getClientID() {

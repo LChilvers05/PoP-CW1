@@ -130,6 +130,13 @@ class ChatServer implements ClientsDelegate {
 
   @Override
   public void forgetClient(String clientID) {
+    //remove DoDClient if asked to
+    if (dodClient != null) {
+      if (clientID.equals(dodClient.getClientID())) {
+        dodClient = null;
+        return;
+      }
+    }
     //remove client
     synchronized(clients) {
       clients.remove(clientID);
@@ -171,15 +178,22 @@ class ChatServer implements ClientsDelegate {
   }
 
   @Override
+  public Boolean dodClientExists() {
+    return dodClient != null;
+  }
+
+  @Override
   public void disconnectClients() {
     // request all clients to disconnect
     synchronized(clients) {
       for (ChatConnection client : clients.values()) {
         client.sendDisconnectRequest();
       }
+      clients.clear();
     }
     if (dodClient != null) {
       dodClient.sendDisconnectRequest();
+      dodClient = null;
     }
   }
 
