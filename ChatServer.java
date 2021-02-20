@@ -18,9 +18,9 @@ class ChatServer implements ClientsDelegate {
   private boolean running = false;
 
   //hashmap so direct access to client with id
-  private HashMap<String, ChatConnection> clients = new HashMap<>();
+  private HashMap<String, ChatPlayConnection> clients = new HashMap<>();
   //only ever one dodClient
-  private ChatConnection dodClient;
+  private ChatPlayConnection dodClient;
   private ChatQueue chatQueue;
 
   public ChatServer(int port) {
@@ -87,7 +87,7 @@ class ChatServer implements ClientsDelegate {
    */
   private void createClient(Socket clientSocket, BufferedReader clientIn, PrintWriter clientOut, String type) {
     //create new client
-    ChatConnection client = new ChatConnection(clientSocket, clientIn, clientOut, chatQueue);
+    ChatPlayConnection client = new ChatPlayConnection(clientSocket, clientIn, clientOut, chatQueue);
     client.clientDelegate = this;
 
     Boolean multipleDoDFlag = false;
@@ -137,7 +137,7 @@ class ChatServer implements ClientsDelegate {
   //ClientsDelegate methods:
 
   @Override
-  public void addClient(String clientID, ChatConnection client) {
+  public void addClient(String clientID, ChatPlayConnection client) {
     //remember client
     synchronized(clients) {
       clients.put(clientID, client);
@@ -163,7 +163,7 @@ class ChatServer implements ClientsDelegate {
   @Override
   public void sendToAllClients(String sender) {
     //for all client connections
-    for (ChatConnection client : clients.values()) {
+    for (ChatPlayConnection client : clients.values()) {
       // if not playing dod
       if (!client.getIsPlayingDoD()) {
         client.sendChatMessage(sender);
@@ -188,7 +188,7 @@ class ChatServer implements ClientsDelegate {
 
   @Override
   public void swapChatPlayer(String clientID) {
-    ChatConnection client = clients.get(clientID);
+    ChatPlayConnection client = clients.get(clientID);
     //swap player <--> chatter
     client.setIsPlayingDoD(!client.getIsPlayingDoD());
   }
@@ -202,7 +202,7 @@ class ChatServer implements ClientsDelegate {
   public void disconnectClients() {
     // request all clients to disconnect
     synchronized(clients) {
-      for (ChatConnection client : clients.values()) {
+      for (ChatPlayConnection client : clients.values()) {
         client.sendDisconnectRequest();
       }
       //forget all clients

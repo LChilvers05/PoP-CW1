@@ -6,12 +6,12 @@ import java.net.Socket;
 /**
  * listens to server in separate thread and outputs to user
  */
-public class UserConnection extends ClientSideConnection implements Runnable {
+public class UserListener extends ClientSideConnection implements Runnable {
 
   //New Line: to properly format DoD map
   private final String NL = "NL";
 
-  public UserConnection (Socket serverSocket, String id) {
+  public UserListener (Socket serverSocket, String id) {
     super(serverSocket, id);
   }
 

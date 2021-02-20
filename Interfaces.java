@@ -9,7 +9,7 @@
  */
 interface ClientsDelegate {
   //tell ChatServer to change clients hashmap
-  public void addClient(String clientID, ChatConnection client);
+  public void addClient(String clientID, ChatPlayConnection client);
   public void forgetClient(String clientID);
   //used for Chat only
   public void sendToAllClients(String sender);

@@ -41,7 +41,7 @@ class UserClient extends Client implements Closer {
         serverOut.println("CHAT");
         serverOut.println(ID);
         //start new user connection thread to read messages
-        UserConnection server = new UserConnection(socket, ID);
+        UserListener server = new UserListener(socket, ID);
         //delegation pattern so connection thread talks to UserClient
         server.closer = this;
         Thread serverThread = new Thread(server);

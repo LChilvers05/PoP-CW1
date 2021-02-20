@@ -3,27 +3,24 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-class ChatConnection extends ServerSideConnection implements Runnable {
+class ChatPlayConnection extends ServerSideConnection implements Runnable {
 
   ChatQueue chatQueue;
 
+  //type of client this connection is for
   private Boolean isDoDClient = false;
   private Boolean isPlayingDoD = false;
-
+  //to help understand DoD map information
   private final String EOT = "EOT";
   private final String NL = "NL";
 
-  /**
-   * for handling client connections on a separate thread
-   * @param clientSocket
-   */
-  public ChatConnection(Socket clientSocket, BufferedReader clientIn, PrintWriter clientOut, ChatQueue chatQueue) {
+  public ChatPlayConnection(Socket clientSocket, BufferedReader clientIn, PrintWriter clientOut, ChatQueue chatQueue) {
     super(clientSocket, clientIn, clientOut);
     this.chatQueue = chatQueue;
   }
 
   /**
-   * close the client connection
+   * tell ChatServer to forget client
    */
   @Override
   public void closeClientSocket() {
@@ -34,7 +31,6 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   /**
    * format the chat message before sending to chat
    */
-  @Override
   public void sendChatMessage(String sender) {
     String msg = sender + ";" + chatQueue.next();
     //send to client
@@ -110,6 +106,10 @@ class ChatConnection extends ServerSideConnection implements Runnable {
     }
   }
 
+  /**
+   * handle message sent from chatter client
+   * @param msg
+   */
   private void handleChat(String msg) {
     //requesting to start DoD game
     if (msg.toUpperCase().equals("JOIN")) {
@@ -127,16 +127,10 @@ class ChatConnection extends ServerSideConnection implements Runnable {
     }
   }
 
-  private void handleGameDoD(String msg) {
-    String player = getPlayerID(msg);
-    String result = getMessage(msg);
-    clientDelegate.sendToClient(clientID, player, result);
-    //need to swap player back to chatter
-    if (result.contains("LOSE") || result.contains("WIN")) {
-      clientDelegate.swapChatPlayer(player);
-    }
-  }
-
+  /**
+   * handle command sent from player client
+   * @param cmd
+   */
   private void handleGamePlayer(String cmd) {
     if (clientDelegate.dodClientExists()) {
       //send command to the DoDClient
@@ -144,6 +138,20 @@ class ChatConnection extends ServerSideConnection implements Runnable {
     } else {
       clientOut.println(clientSocket.getLocalPort() + ",Server;Dungeon of Doom is unavailable right now.");
       isPlayingDoD = false;
+    }
+  }
+
+  /**
+   * handle message sent from DoDClient
+   * @param msg
+   */
+  private void handleGameDoD(String msg) {
+    String player = getPlayerID(msg);
+    String result = getMessage(msg);
+    clientDelegate.sendToClient(clientID, player, result);
+    //need to swap player back to chatter
+    if (result.contains("LOSE") || result.contains("WIN")) {
+      clientDelegate.swapChatPlayer(player);
     }
   }
 
@@ -158,10 +166,10 @@ class ChatConnection extends ServerSideConnection implements Runnable {
   public void setIsDoD(Boolean is) {
     isDoDClient = is;
   }
-  public void setIsPlayingDoD(Boolean is) {
-    isPlayingDoD = is;
-  }
   public Boolean getIsPlayingDoD() {
     return isPlayingDoD;
+  }
+  public void setIsPlayingDoD(Boolean is) {
+    isPlayingDoD = is;
   }
 }
