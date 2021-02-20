@@ -65,7 +65,7 @@ class ChatServer implements ClientsDelegate {
       while(running) {
         //accept client connection of type
         Socket clientSocket = serverSocket.accept();
-        println("Connection on: " + serverSocket.getLocalPort() + " ; " + clientSocket.getPort() + ".");
+        println("Connection on: " + serverSocket.getLocalPort() + " ; " + clientSocket.getPort());
         BufferedReader clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         PrintWriter clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
         createClient(clientSocket, clientIn, clientOut, clientIn.readLine());
