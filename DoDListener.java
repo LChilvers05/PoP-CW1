@@ -3,6 +3,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
+/**
+ * listens for game commands and informs DoDClient to handle
+ */
 class DoDListener extends BotListener {
 
   public DoDListener(Socket serverSocket, String id) {
@@ -22,6 +25,8 @@ class DoDListener extends BotListener {
         if (command.equals("SERVER_SHUTDOWN")) {
           break;
         }
+        //log all commands from everyone
+        println(command);
         replyDelegate.replyToMessage(command);
       }
 

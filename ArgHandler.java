@@ -27,17 +27,17 @@ class ArgHandler {
   /**
    * process argument to specify port
    * @param args arguments passed in
+   * @param param -csp for server, -ccp for client
    * @return port specified, 14001 or -1 (error)
    */
   public static int getPort(List<String> args, String param) {
-    //for server param = -csp
-    //for client param = -ccp
     try {
       if (args.contains(param)) {
         int i = args.indexOf(param);
         int port = Integer.parseInt(args.get(i + 1));
         return port;
       } else {
+        //no param passed
         return 14001;
       }
     } catch (IndexOutOfBoundsException e) {

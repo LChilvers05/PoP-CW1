@@ -2,10 +2,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * handle and progress each game for player client
+ */
 class DoDClient extends Client implements ReplyDelegate {
 
+  //game belongs to player's clientID
   private HashMap<String, GameLogic> games = new HashMap<>();
 
+  //End Of Transmission - because map is sent to server on multiple lines
   private final String EOT = "EOT";
 
   public DoDClient(String address, int port) {
@@ -19,13 +24,13 @@ class DoDClient extends Client implements ReplyDelegate {
   public void connect() {
     if (socket != null) {
       super.connect();
-
+      //request to be the one DoDClient held by server
       serverOut.println("DOD");
       //give the client connection a unique identifier
       serverOut.println(ID);
       //start new user connection to read game events
       DoDListener dod = new DoDListener(socket, ID);
-      //delegation patter so connection thread talks to DoDClient
+      //delegation pattern so connection thread talks to DoDClient
       dod.replyDelegate = this;
       dod.listen();
     }
@@ -71,11 +76,16 @@ class DoDClient extends Client implements ReplyDelegate {
         }
 
       } else {
+        //if player is ever communicating with DoDClient without a game started
         serverOut.println(playerID + ";Start a game with JOIN" + EOT);
       }
     }
   }
 
+  /**
+   * create new DoD game
+   * @return game
+   */
   private GameLogic newGame() {
     //create game, map and player
     GameLogic game = new GameLogic();

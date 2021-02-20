@@ -1,7 +1,9 @@
 import java.util.Arrays;
 import java.util.List;
 
-/**Main function that instantiates all types of clients with  */
+/**
+ * Main function that instantiates all types of clients with args
+ */
 class ChatClient {
   public static void main(String[] args) {
     //get all things specified on 'java ChatClient -args'

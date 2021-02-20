@@ -3,7 +3,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.UUID;
 
-/**client operated by a user */
+/**
+ * a client operated by a real user
+ */
 class UserClient extends Client implements Closer {
 
   BufferedReader userInput;
@@ -21,9 +23,6 @@ class UserClient extends Client implements Closer {
     }
   }
   
-  /**
-   * close the console input reader
-   */
   @Override
   public void closeReaders() {
     try {
@@ -33,14 +32,12 @@ class UserClient extends Client implements Closer {
     }
   }
 
-  /**
-   * 
-   */
   @Override
   public void connect() {
     if (socket != null) {
       super.connect();
       try {
+        //tell server it is initially a chat client with ID
         serverOut.println("CHAT");
         serverOut.println(ID);
         //start new user connection thread to read messages
@@ -49,7 +46,7 @@ class UserClient extends Client implements Closer {
         server.closer = this;
         Thread serverThread = new Thread(server);
         serverThread.start();
-        //repeatedly get messages from console
+        //get user input from console
         while(true) {
           String userInputStr = userInput.readLine();
           if (userInputStr == null) {

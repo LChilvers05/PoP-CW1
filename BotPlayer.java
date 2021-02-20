@@ -5,7 +5,6 @@ import java.util.Stack;
 
 /**
  * Runs the game with bot player and contains code needed to chase human player.
- *
  */
 public class BotPlayer extends Player {
 

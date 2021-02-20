@@ -262,33 +262,6 @@ public class GameLogic {
         }
         return mapFile;
     }
-	
-	// public static void main(String[] args) {
-    //     //create game, map and player
-    //     GameLogic logic = new GameLogic();
-    //     logic.map = new Map(logic.gameIntro());
-    //     logic.p1 = new HumanPlayer(logic, logic.randomPosition());
-    //     logic.p2 = new BotPlayer(logic, logic.randomPosition());
-        
-    //     //game loop
-    //     logic.gameRunning = true;
-    //     while(logic.gameRunning()) {
-    //         // println(logic.checkMap()); //for debug
-    //         //bot caught human
-    //         if (Arrays.equals(logic.p1.position, logic.p2.position)) {
-    //             println("LOSE");
-    //             logic.gameRunning = false;
-    //             break;
-    //         }
-    //         //swap turns
-    //         logic.currentPlayer = (logic.currentPlayer == logic.p1) ? logic.p2 : logic.p1;
-    //         logic.nextPlayer = (logic.nextPlayer == logic.p2) ? logic.p1 : logic.p2;
-    //         //prints the response from the players command inputs
-    //         println(logic.currentPlayer.getNextAction());
-    //     }
-    //     // program end - close input scanner
-    //     userInput.close();
-    // }
 
     //helpers
     public static void println(String message) {

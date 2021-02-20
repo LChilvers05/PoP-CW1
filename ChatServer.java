@@ -9,12 +9,17 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * starts the server and handles all clients
+ */
 class ChatServer implements ClientsDelegate {
 
   private ServerSocket serverSocket;
   private boolean running = false;
 
+  //hashmap so direct access to client with id
   private HashMap<String, ChatConnection> clients = new HashMap<>();
+  //only ever one dodClient
   private ChatConnection dodClient;
   private ChatQueue chatQueue;
 
@@ -26,8 +31,7 @@ class ChatServer implements ClientsDelegate {
 
   /**
    * open the server socket connection
-   * 
-   * @param port
+   * @param port port to be used
    */
   private void openSocket(int port) {
     try {
@@ -52,6 +56,9 @@ class ChatServer implements ClientsDelegate {
     }
   }
 
+  /**
+   * accepts new client connections
+   */
   public void startServer() {
     try {
       //continuously get client connections
@@ -69,6 +76,38 @@ class ChatServer implements ClientsDelegate {
     } finally {
       disconnectClients();
     }
+  }
+
+  /**
+   * creates client connections as a thread and manages single DoDClient
+   * @param clientSocket  the accepted socket
+   * @param clientIn  to read from client
+   * @param clientOut to send to client
+   * @param type CHAT client or DOD client
+   */
+  private void createClient(Socket clientSocket, BufferedReader clientIn, PrintWriter clientOut, String type) {
+    //create new client
+    ChatConnection client = new ChatConnection(clientSocket, clientIn, clientOut, chatQueue);
+    client.clientDelegate = this;
+
+    Boolean multipleDoDFlag = false;
+    //check for DoD Client
+    if (type.equals("DOD")) {
+      if (dodClient == null) {
+        client.setIsDoD(true);
+        dodClient = client;
+      } else {
+        //trying to add multiple DoDClients
+        multipleDoDFlag = true;
+      }
+    }
+
+    //new thread for this client
+    Thread clientThread = new Thread(client);
+    clientThread.start();
+
+    //already have a DoDClient, deny request
+    if (multipleDoDFlag) { client.sendDisconnectRequest(); }
   }
   
   /** 
@@ -93,29 +132,6 @@ class ChatServer implements ClientsDelegate {
       }
     };
     stopperThread.start();
-  }
-
-  private void createClient(Socket clientSocket, BufferedReader clientIn, PrintWriter clientOut, String type) {
-    //create new client
-    ChatConnection client = new ChatConnection(clientSocket, clientIn, clientOut, chatQueue);
-    client.clientDelegate = this;
-
-    Boolean multipleDoDFlag = false;
-    //check for DoD Client
-    if (type.equals("DOD")) {
-      if (dodClient == null) {
-        client.setIsDoD(true);
-        dodClient = client;
-      } else {
-        multipleDoDFlag = true;
-      }
-    }
-
-    //new thread for this client
-    Thread clientThread = new Thread(client);
-    clientThread.start();
-
-    if (multipleDoDFlag) { client.sendDisconnectRequest(); }
   }
 
   //ClientsDelegate methods:
@@ -189,6 +205,7 @@ class ChatServer implements ClientsDelegate {
       for (ChatConnection client : clients.values()) {
         client.sendDisconnectRequest();
       }
+      //forget all clients
       clients.clear();
     }
     if (dodClient != null) {
@@ -203,6 +220,7 @@ class ChatServer implements ClientsDelegate {
   }
 
   public static void main(String[] args) {
+    //use ArgHandler to get specified port
     List<String> listArgs = Arrays.asList(args);
     int port = ArgHandler.getPort(listArgs, "-csp");
     ChatServer chatServer = new ChatServer(port);

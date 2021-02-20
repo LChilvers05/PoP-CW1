@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 /**
  * Reads and contains in memory the map of the game.
- *
  */
 public class Map {
 
