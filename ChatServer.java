@@ -204,7 +204,7 @@ class ChatServer implements ClientsDelegate {
 
   public static void main(String[] args) {
     List<String> listArgs = Arrays.asList(args);
-    int port = ArgHandler.getPort(listArgs);
+    int port = ArgHandler.getPort(listArgs, "-csp");
     ChatServer chatServer = new ChatServer(port);
     chatServer.startServer();
   }

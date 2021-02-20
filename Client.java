@@ -21,7 +21,7 @@ abstract class Client {
       socket = new Socket(address, port);
 
     } catch (UnknownHostException e) {
-      println("This is not a know server host, closing program.");
+      println("This is not a known server host, closing program.");
     } catch (IOException e) {
       println("Could not connect to server, closing program.");
     }
