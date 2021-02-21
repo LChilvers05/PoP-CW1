@@ -1,5 +1,3 @@
-import java.io.IOException;
-import java.net.Socket;
 import java.util.List;
 
 class ArgHandler {
@@ -15,11 +13,7 @@ class ArgHandler {
       if (args.contains("-cca")) {
         int i = args.indexOf("-cca");
         String address = args.get(i + 1);
-        try (Socket test = new Socket(address, 14001)) {
-          return address;
-        } catch (IOException e) {
-          System.out.println("Closing due to bad address given.");
-        }
+        return address;
       } else {
         return "localhost";
       }
@@ -33,15 +27,17 @@ class ArgHandler {
   /**
    * process argument to specify port
    * @param args arguments passed in
+   * @param param -csp for server, -ccp for client
    * @return port specified, 14001 or -1 (error)
    */
-  public static int getPort(List<String> args) {
+  public static int getPort(List<String> args, String param) {
     try {
-      if (args.contains("-csp")) {
-        int i = args.indexOf("-csp");
+      if (args.contains(param)) {
+        int i = args.indexOf(param);
         int port = Integer.parseInt(args.get(i + 1));
         return port;
       } else {
+        //no param passed
         return 14001;
       }
     } catch (IndexOutOfBoundsException e) {

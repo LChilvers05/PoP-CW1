@@ -1,5 +1,8 @@
 import java.util.Random;
 
+/**
+ * generates a scripted response for BotClient to reply with
+ */
 public class MessageHandler {
 
   /**

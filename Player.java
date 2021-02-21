@@ -29,7 +29,7 @@ public abstract class Player {
     /**
      * @return A string containing the input the player entered.
      */
-    protected abstract String getInput();
+    protected abstract String getInput(String cmd);
 
     /**
      * Processes the command. Returns a reply in form of a String.
@@ -37,8 +37,8 @@ public abstract class Player {
      *
      * @return : Processed output or Invalid if the input is wrong.
      */
-    protected String getNextAction() {
-        String command = getInput();
+    protected String getNextAction(String cmd) {
+        String command = getInput(cmd);
         //use GameLogic to execute commands
         //return response back to GameLogic
         switch(command) {

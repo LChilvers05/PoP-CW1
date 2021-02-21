@@ -2,18 +2,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.Socket;
 
-/**inherited from to read from the server*/
+/**
+ * inherited from to read from the server
+ */
 abstract class ClientSideConnection {
 
-  Socket serverSocket;
+  protected Socket serverSocket;
 
   /**to read from server */
-  BufferedReader serverIn;
+  protected BufferedReader serverIn;
 
-  /**to communicate with Client from Connection*/
+  /**to communicate with Client from ClientSideConnection*/
   Closer closer;
-
-  String ID;
+  /**same as Client ID*/
+  protected String ID;
 
   public ClientSideConnection (Socket serverSocket, String id) {
     this.serverSocket = serverSocket;

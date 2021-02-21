@@ -233,62 +233,9 @@ public class GameLogic {
      * @return File of map chosen.
      */
     public File gameIntro() {
-        File mapFile = new File("small_example_map.txt");
-        // println("=======================================");
-        // println("==  Welcome to the Dungeon of Doom!  ==");
-        // println("=======================================");
-        // println("Please select map or enter custom_map_file_name.txt :");
-        // println("SMALL");
-        // println("MEDIUM");
-        // println("LARGE");
-        // println("");
-        boolean chosen = false;
-        while (!chosen) {
-            // String mapChoice = userInput.nextLine().toLowerCase();
-            String mapChoice = "medium";
-            //entered choice shortcut
-            if (mapChoice.equals("small") || mapChoice.equals("medium") || mapChoice.equals("large")) {
-                mapFile = new File(mapChoice + "_example_map.txt");
-                chosen = mapFile.exists();
-            } else {
-                //check for other map file
-                mapFile = new File(mapChoice);
-                chosen = mapFile.exists();
-            }
-            if (chosen == false) {
-                println("File not found.");
-                println("Please type 'SMALL', 'MEDIUM' or 'LARGE' to begin.");
-            }
-        }
+        File mapFile = new File("medium_example_map.txt");
         return mapFile;
     }
-	
-	// public static void main(String[] args) {
-    //     //create game, map and player
-    //     GameLogic logic = new GameLogic();
-    //     logic.map = new Map(logic.gameIntro());
-    //     logic.p1 = new HumanPlayer(logic, logic.randomPosition());
-    //     logic.p2 = new BotPlayer(logic, logic.randomPosition());
-        
-    //     //game loop
-    //     logic.gameRunning = true;
-    //     while(logic.gameRunning()) {
-    //         // println(logic.checkMap()); //for debug
-    //         //bot caught human
-    //         if (Arrays.equals(logic.p1.position, logic.p2.position)) {
-    //             println("LOSE");
-    //             logic.gameRunning = false;
-    //             break;
-    //         }
-    //         //swap turns
-    //         logic.currentPlayer = (logic.currentPlayer == logic.p1) ? logic.p2 : logic.p1;
-    //         logic.nextPlayer = (logic.nextPlayer == logic.p2) ? logic.p1 : logic.p2;
-    //         //prints the response from the players command inputs
-    //         println(logic.currentPlayer.getNextAction());
-    //     }
-    //     // program end - close input scanner
-    //     userInput.close();
-    // }
 
     //helpers
     public static void println(String message) {

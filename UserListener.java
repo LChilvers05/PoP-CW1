@@ -3,10 +3,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-/**listens to server in separate thread and outputs to user */
-public class UserConnection extends ClientSideConnection implements Runnable {
+/**
+ * listens to server in separate thread and outputs to user
+ */
+public class UserListener extends ClientSideConnection implements Runnable {
 
-  public UserConnection (Socket serverSocket, String id) {
+  //New Line: to properly format DoD map
+  private final String NL = "NL";
+
+  public UserListener (Socket serverSocket, String id) {
     super(serverSocket, id);
   }
 
@@ -28,9 +33,10 @@ public class UserConnection extends ClientSideConnection implements Runnable {
       while(true) {
         //response = clientID: message
         String response = serverIn.readLine();
+        response = response.replaceAll(NL, "\n");
         //server shut down, disconnect client
         if (response.equals("SERVER_SHUTDOWN")) {
-          UserClient.println("Server Stopped.");
+          println("Server Stopped.");
           break;
         }
         String msg = formatMessage(response, ID);

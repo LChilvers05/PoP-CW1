@@ -1,9 +1,11 @@
 import java.util.LinkedList;
 
+/**
+ * simple queue data structure to hold chat messages
+ */
 class ChatQueue {
 
   private LinkedList<String> queue;
-  //queueSize
 
   public ChatQueue(LinkedList<String> queue) {
     this.queue = queue;

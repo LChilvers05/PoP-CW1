@@ -3,7 +3,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.UUID;
 
-/**client operated by a user */
+/**
+ * a client operated by a real user
+ */
 class UserClient extends Client implements Closer {
 
   BufferedReader userInput;
@@ -21,9 +23,6 @@ class UserClient extends Client implements Closer {
     }
   }
   
-  /**
-   * close the console input reader
-   */
   @Override
   public void closeReaders() {
     try {
@@ -33,35 +32,35 @@ class UserClient extends Client implements Closer {
     }
   }
 
-  /**
-   * 
-   */
   @Override
   public void connect() {
-    super.connect();
-    try {
-      serverOut.println("CHAT");
-      serverOut.println(ID);
-      //start new user connection thread to read messages
-      UserConnection server = new UserConnection(socket, ID);
-      //delegation pattern so connection thread talks to UserClient
-      server.closer = this;
-      Thread serverThread = new Thread(server);
-      serverThread.start();
-      //repeatedly get messages from console
-      while(true) {
-        String userInputStr = userInput.readLine();
-        if (userInputStr == null) {
-          break;
+    if (socket != null) {
+      super.connect();
+      try {
+        //tell server it is initially a chat client with ID
+        serverOut.println("CHAT");
+        serverOut.println(ID);
+        //start new user connection thread to read messages
+        UserListener server = new UserListener(socket, ID);
+        //delegation pattern so connection thread talks to UserClient
+        server.closer = this;
+        Thread serverThread = new Thread(server);
+        serverThread.start();
+        //get user input from console
+        while(true) {
+          String userInputStr = userInput.readLine();
+          if (userInputStr == null) {
+            break;
+          }
+          //send message
+          serverOut.println(userInputStr);
         }
-        //send message
-        serverOut.println(userInputStr);
+  
+      } catch (IOException e) {
+        println("Disconnected.");
+      } finally {
+        closeSocket();
       }
-
-    } catch (IOException e) {
-      println("Disconnected.");
-    } finally {
-      closeSocket();
     }
   }
 }

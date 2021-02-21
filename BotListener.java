@@ -3,7 +3,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-/**listens to server and tells ChatBot to reply*/
+/**
+ * listens to server and tells ChatBot to reply
+ */
 public class BotListener extends ClientSideConnection {
   
   ReplyDelegate replyDelegate;
@@ -21,15 +23,16 @@ public class BotListener extends ClientSideConnection {
       serverIn = new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 
       while(true) {
-        //response = clientID: message
+        //response = clientID; message
         String response = serverIn.readLine();
-        //server shut down, disconnect client
+        //server requests client to shutdown
         if (response.equals("SERVER_SHUTDOWN")) {
           break;
         }
         //so bot doesn't reply to self
         if (!response.split(";")[0].equals(ID)) {
           String msg = formatMessage(response, ID);
+          println(msg);
           //get ChatBot to reply to the message
           replyDelegate.replyToMessage(msg);
         }
