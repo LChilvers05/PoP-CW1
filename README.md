@@ -50,6 +50,8 @@ To return to the chat room, send command **QUIT** while playing.
 
 (See the Dungeon of Doom section for how to play the game)
 
+Clients can close the console window to disconnect from the server.
+
 ## Code
 ---
 This project makes use of the delegation pattern so that objects instantiated from classes such as BotListener and ChatPlayerConnection can communicate with their owners in a decoupled way (Sundell, 2018).
