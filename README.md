@@ -56,7 +56,7 @@ Clients can close the console window to disconnect from the server.
 ---
 This project makes use of the delegation pattern so that objects instantiated from classes such as BotListener and ChatPlayerConnection can communicate with their owners in a decoupled way (Sundell, 2018).
 - **class ChatServer** = Contains the Main method to start the server. It accepts client connections and manages them as they connect, disconnect and request to send messages to each other.
-- **class ChatClient** = Contains the Main method to create a client. Essentially a factory to create the client with the passed parameters.
+- **class ChatClient** = Contains the Main method to create a client. Uses ArgHandler as a factory to create the client with the passed parameters.
 - **class ServerSideConnection** = An abstract class which encapsulates methods to disconnect and the unique identifier for the client connected.
 - **class ChatPlayConnection** = Subclass of ServerSideConnection. Implements Runnable so that a new thread is created everytime ChatServer accepts a connection. This class represents a client: it reads from it and writes to it. The ClientsDelegate interface is used to go through the ChatServer when it needs to communicate with another client.
 - **class Client** = An abstract class which is purely concerned with everything that is needed to open and close the socket to the server.
