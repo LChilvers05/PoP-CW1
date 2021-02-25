@@ -41,7 +41,6 @@ Raw messages are sent in the format:
 **unique_ID,client_Name;message_To_Client**  
 to be used appropriately when needed on both the server and client side.
 
-
 ## Entering the Dungeon
 ---
 To begin a game of dungeon of doom a DoDClient must be connected to the server.  A user can simply type **JOIN** as a message to spawn in their own instance of the game.   
@@ -50,7 +49,7 @@ To return to the chat room, send command **QUIT** while playing.
 
 (See the Dungeon of Doom section for how to play the game)
 
-Clients can close the console window to disconnect from the server.
+Clients can type **EXIT** or just close the console window to disconnect from the server.
 
 ## Code
 ---
@@ -89,7 +88,7 @@ Commands you can input:
 - **GOLD** = tells you how much gold you currently own.
 - **MOVE N,S,E,W**  = changes your position on the map.
 - **PICKUP** = use when over some gold (G) to increase the amount of gold you own.
-- **QUIT** = to be used when over exit (E) tile after you have the required amount of gold. Using this command without satisfying these conditions means you lose the game. You are then returned to the chat room.
+- **QUIT** = to be used when over exit (E) tile after you have the required amount of gold. Using this command without satisfying these conditions means you lose the game. You are then returned to the chat room. **NOTE: QUIT will leave the game, EXIT will disconnect the client from the server.**
 - **LOOK** = displays your surroundings in a 5x5 grid.
 
 Commands can be entered lowercase.
@@ -125,5 +124,6 @@ When you and the Bot use LOOK, you get an understanding of what is around. Here 
 
 ## References
 ---
-- Sundell, JS., 2018. Delegation in Swift. Swift by Sundell. Available from: https://www.swiftbysundell.com/articles/delegation-in-swift/ [Accessed 20 February 2021]
-- Cohen, C., 2014. Converting a 2D matrix into a graph. Stack Overflow. Available from: https://stackoverflow.com/questions/25405165/converting-a-2d-matrix-into-a-graph [Accessed 8 December 2020]
+- Chilvers, L., 2020. Dungeon of Doom, CM10227. University of Bath. Unpublished assignment.
+- Sundell, J., 2018. Delegation in Swift. Swift by Sundell. Available from: https://www.swiftbysundell.com/articles/delegation-in-swift/ [Accessed 20 February 2021]
+- Cohen, 2014. Converting a 2D matrix into a graph. Stack Overflow. Available from: https://stackoverflow.com/questions/25405165/converting-a-2d-matrix-into-a-graph [Accessed 8 December 2020]
