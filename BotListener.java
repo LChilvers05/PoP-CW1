@@ -25,16 +25,22 @@ public class BotListener extends ClientSideConnection {
       while(true) {
         //response = clientID; message
         String response = serverIn.readLine();
-        //server requests client to shutdown
-        if (response.equals("SERVER_SHUTDOWN")) {
+        if (response != null) {
+          //server requests client to shutdown
+          if (response.equals("SERVER_SHUTDOWN")) {
+            break;
+          }
+          //so bot doesn't reply to self
+          if (!response.split(";")[0].equals(ID)) {
+            String msg = formatMessage(response, ID);
+            println(msg);
+            //get ChatBot to reply to the message
+            replyDelegate.replyToMessage(msg);
+          }
+
+        //no server
+        } else {
           break;
-        }
-        //so bot doesn't reply to self
-        if (!response.split(";")[0].equals(ID)) {
-          String msg = formatMessage(response, ID);
-          println(msg);
-          //get ChatBot to reply to the message
-          replyDelegate.replyToMessage(msg);
         }
       }
       

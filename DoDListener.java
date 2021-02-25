@@ -21,13 +21,19 @@ class DoDListener extends BotListener {
       while(true) {
         //game command = clientID; command
         String command = serverIn.readLine();
-        //server shut down, diconnect client
-        if (command.equals("SERVER_SHUTDOWN")) {
+        if (command != null) {
+          //server shut down, diconnect client
+          if (command.equals("SERVER_SHUTDOWN")) {
+            break;
+          }
+          //log all commands from everyone
+          println(command);
+          replyDelegate.replyToMessage(command);
+         
+        //no server
+        } else {
           break;
         }
-        //log all commands from everyone
-        println(command);
-        replyDelegate.replyToMessage(command);
       }
 
     } catch (IOException e) {

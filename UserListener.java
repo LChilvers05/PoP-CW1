@@ -33,15 +33,21 @@ public class UserListener extends ClientSideConnection implements Runnable {
       while(true) {
         //response = clientID: message
         String response = serverIn.readLine();
-        response = response.replaceAll(NL, "\n");
-        //server shut down, disconnect client
-        if (response.equals("SERVER_SHUTDOWN")) {
-          println("Server Stopped.");
+        if (response != null) {
+          response = response.replaceAll(NL, "\n");
+          //server shut down, disconnect client
+          if (response.equals("SERVER_SHUTDOWN")) {
+            println("Server Stopped.");
+            break;
+          }
+          String msg = formatMessage(response, ID);
+          //output formatted message
+          println(msg);
+        
+        //no server
+        } else {
           break;
         }
-        String msg = formatMessage(response, ID);
-        //output formatted message
-        println(msg);
       }
   
     } catch (IOException e) {
