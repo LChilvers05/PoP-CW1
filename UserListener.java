@@ -43,6 +43,7 @@ public class UserListener extends ClientSideConnection implements Runnable {
           String msg = formatMessage(response, ID);
           //output formatted message
           println(msg);
+          println("");
         
         //no server
         } else {

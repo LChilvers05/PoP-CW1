@@ -24,7 +24,8 @@ abstract class ClientSideConnection {
 
   /**
    * gets the name of client from clientID
-   * @param clientID uniqueID,name
+   * @param clientID id of the other client
+   * @param id id of this client
    * @return name
    */
   public static String getClientName(String clientID, String id) {

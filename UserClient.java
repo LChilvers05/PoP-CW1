@@ -26,6 +26,7 @@ class UserClient extends Client implements Closer {
   @Override
   public void closeReaders() {
     try {
+      println("Disconnected, press Enter to end.");
       userInput.close();
     } catch (IOException e) {
       e.printStackTrace();
@@ -57,7 +58,7 @@ class UserClient extends Client implements Closer {
         }
   
       } catch (IOException e) {
-        println("Disconnected.");
+        println("Goodbye.");
       } finally {
         closeSocket();
       }

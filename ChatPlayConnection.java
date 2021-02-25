@@ -88,6 +88,9 @@ class ChatPlayConnection extends ServerSideConnection implements Runnable {
           if (msg == null) {
             break;
           }
+          if (msg.toUpperCase().equals("EXIT")) {
+            break;
+          }
 
           if (isPlayingDoD) {
             handleGamePlayer(msg);

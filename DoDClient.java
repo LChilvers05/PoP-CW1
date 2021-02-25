@@ -43,7 +43,7 @@ class DoDClient extends Client implements ReplyDelegate {
     //start a new game for playerID
     if (cmd.equals("JOIN")) {
       games.put(playerID, newGame());
-      serverOut.println(playerID + ";> Spawned" + EOT);
+      serverOut.println(playerID + ";" + ClientSideConnection.getClientName(playerID, ID) + " Spawned" + EOT);
 
     //playerID has a game started
     } else {

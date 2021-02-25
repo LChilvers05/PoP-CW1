@@ -36,8 +36,6 @@ abstract class Client {
   public void closeSocket() {
     try {
       socket.close();
-      println("Goodbye.");
-
     } catch (IOException e) {
       e.printStackTrace();
     }
