@@ -44,7 +44,10 @@ abstract class ClientSideConnection {
   public String formatMessage(String response, String id) {
     String[] splitResponse = response.split(";");
     String name = getClientName(splitResponse[0], id);
-    String msg = splitResponse[1];
+    String msg = "";
+    if (splitResponse.length == 2) {
+      msg = splitResponse[1];
+    }
     return name + ": " + msg;
   }
 

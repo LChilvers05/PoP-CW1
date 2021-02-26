@@ -103,6 +103,10 @@ class DoDClient extends Client implements ReplyDelegate {
 
   private String getCommand(String response) {
     String[] splitResponse = response.split(";");
-    return splitResponse[1].toUpperCase();
+    String cmd = "";
+    if (splitResponse.length == 2) {
+      cmd = splitResponse[1].toUpperCase();
+    }
+    return cmd;
   }
 }
