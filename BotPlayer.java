@@ -1,3 +1,6 @@
+// Reused Code:
+// Chilvers, L., 2020. Dungeon of Doom, CM10227. University of Bath. Unpublished assignment.
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
