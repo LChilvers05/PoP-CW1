@@ -48,8 +48,6 @@ To begin a game of dungeon of doom a DoDClient must be connected to the server. 
 From this point, any commands will only be sent to the DoDClient to play the game.  
 To return to the chat room, send command QUIT while playing.
 
-(See the Dungeon of Doom section for how to play the game)
-
 Clients can type EXIT or just close the console window to disconnect from the server.
 
 Code
@@ -66,62 +64,13 @@ This project makes use of the delegation pattern so that objects instantiated fr
 - class BotListener = A subclass of ClientSideConnection which receives messages from the server and instructs BotClient to respond using the ReplyDelegate interface.
 - class BotClient = Subclass of Client. Uses MessageHandler to reply to messages received by BotListener.
 - class DoDListener = Subclass of ClientSideConnection. It listens for commands from players sent by the server and informs DoDClient with the replyDelegate to reply with the command's outcome.
-- class DoDClient = Subclass of Client which must be connected for other clients to play DoD. It manages all games and uses GameLogic (see Dungeon of Doom section) to generate a response from the players command.
+- class DoDClient = Subclass of Client which must be connected for other clients to play DoD. It manages all games and uses GameLogic to generate a response from the players command.
 - class MessageHandler = Used by BotClient to encapsulate the logic of returning a scripted response to a message received.
 - class ChatQueue = A simple queue data structure which holds messages to be sent to everyone in the chat room.
 - class ArgHandler = Handles and validates the parameters entered when running ChatServer and different types of ChatClient.
 - interface ClientsDelegate = All the methods to be used by ChatServer which will help manage and access all the clients connected.
 - interface ReplyDelegate = Used on the client side by BotClient and DoDClient so that their listeners can inform them to reply to a message just received.
 - interface Closer = Used to tell the UserClient to close its console input reader after a server shutdown.
-
-DUNGEON OF DOOM
-
-The Game
----
-You, a brave fortune-hunter, have been trapped in a rectangular-shaped dungeon attempting to find gold. While running away from an evil Bot, you must hunt down the required amount of gold and exit the dungeon. If you try to leave without enough gold, or the Bot catches you, you will die.
-
-How To Play
----
-To start a game, type 'JOIN' in the chat room
-
-Commands you can input:
-- HELLO = tells you how much gold you need before you can leave.
-- GOLD = tells you how much gold you currently own.
-- MOVE N,S,E,W  = changes your position on the map.
-- PICKUP = use when over some gold (G) to increase the amount of gold you own.
-- QUIT = to be used when over exit (E) tile after you have the required amount of gold. Using this command without satisfying these conditions means you lose the game. You are then returned to the chat room. NOTE: QUIT will leave the game, EXIT will disconnect the client from the server.
-- LOOK = displays your surroundings in a 5x5 grid.
-
-Commands can be entered lowercase.
-All input takes up a turn.
-
-The Dungeon
----
-When you and the Bot use LOOK, you get an understanding of what is around. Here is how the grid returned should be understood:
-- P = your position. This will always be seen in the centre.
-- B = the Bot's position. It is highly likely if you see it, it sees you and is chasing you!
-- . = a blank space which can be moved onto.
-- G = a space containing gold which can be moved onto.
-- E = an exit space which can be moved onto.
-- # = a wall space which blocks movement here.
-
-Tactics
----
-- It's always good to use LOOK every couple turns or so to make sure you are still going the right way and avoiding the evil Bot. 
-- By piecing together the fragments of the dungeon given to you by LOOK, you can navigate without using up a turn to refresh your memory. Remember, every turn you stay still is a potential turn the Bot gets closer!
-- The Bot needs to make sure it's still on the right course too, use this to your advantage to get further away as it looks at the map. 
-- By running outside of the Bot's surroundings, you will lose it and it will begin searching again rather than chasing.
-- It might be better to leave gold and run if the Bot is too close.
-- The Bot will always travel the shortest route to the last position it saw you.
-
-Code
----
-- class GameLogic = Objects instantiated from this class represent a game. Methods process each of the commands from both Player and Bot and decides if it was successful or not.
-- class Map = reads in Map file when an instance is made. Keeps track of where gold and exits are in the dungeon and updates as gold is collected.
-- class Player = an abstract class which both HumanPlayer and BotPlayer inherit from. Player objects hold their positions in the dungeon.
-- class HumanPlayer = takes input from the console and processes the human command. Responses are returned to be printed to the console. Only the human players collect gold, this current score is stored in the object.
-- class BotPlayer = commands decided from analysing surroundings with an initial LOOK command. Tries its best to simulate how a human would play the game: moving randomly until its goal is identified. When a target is found a new instance of Graph is made to do a breadth first search to chase them with the shortest path.
-- class Graph = parses the 5x5 grid from LOOK into a graph data structure and contains a breadthFirstSearch to find the shortest path between two x,y positions on this grid.
 
 References
 ---
