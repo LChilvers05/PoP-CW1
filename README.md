@@ -1,4 +1,6 @@
-# SIMPLE CHATTING SYSTEM
+# JavaChat
+### A Java project that demonstrates client-server development and multithreading in the form of a chat room and Dungeon of Doom game.
+---
 
 ## Setup
 ---
